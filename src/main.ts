@@ -13,17 +13,18 @@ import {
 } from "./api";
 import { mountEditor, EditorHandle } from "./editor";
 import { TabsManager, Tab } from "./tabs";
-import { Sidebar } from "./sidebar";
 import { icons, iconLabel } from "./icons";
 import { showStatusbar, updateMetrics } from "./statusbar";
 import { exportEditorToPdf } from "./pdf";
 import { initContextMenu } from "./context-menu";
 import {
+  addRecentFile,
   applyPreferences,
   loadPreferences,
   onPreferencesChange,
 } from "./preferences";
-import { initSettingsPanel } from "./settings-panel";
+import { initNavbar } from "./navbar";
+import { initWindowControls } from "./window-controls";
 import { initUpdateChecker } from "./updater";
 import {
   buildSavePath,
@@ -40,38 +41,27 @@ const MD_FILTER = [
   { name: "Markdown", extensions: ["md", "markdown", "mdown", "mkd"] },
 ];
 
-// --- DOM handles -----------------------------------------------------------
 const editorHost = document.getElementById("editor-host") as HTMLElement;
 const emptyState = document.getElementById("empty-state") as HTMLElement;
 const tabbar = document.getElementById("tabbar") as HTMLElement;
-const fileTree = document.getElementById("file-tree") as HTMLElement;
-const settingsPanel = document.getElementById("settings-panel") as HTMLElement;
-const settingsToggle = document.getElementById("settings-toggle") as HTMLButtonElement;
-const appEl = document.getElementById("app") as HTMLElement;
-const openFolderBtn = document.getElementById("open-folder") as HTMLButtonElement;
-const openFileBtn = document.getElementById("open-file") as HTMLButtonElement;
-const newFileBtn = document.getElementById("new-file") as HTMLButtonElement;
-const toggleSidebarBtn = document.getElementById("toggle-sidebar") as HTMLButtonElement;
-const exportPdfBtn = document.getElementById("export-pdf") as HTMLButtonElement;
+const menuFileBtn = document.getElementById("menu-file") as HTMLButtonElement;
+const menuSettingsBtn = document.getElementById("menu-settings") as HTMLButtonElement;
+const menuHelpBtn = document.getElementById("menu-help") as HTMLButtonElement;
+const windowControls = document.getElementById("window-controls") as HTMLElement;
 const emptyNewFile = document.getElementById("empty-new-file") as HTMLButtonElement;
 const emptyOpenFile = document.getElementById("empty-open-file") as HTMLButtonElement;
 const emptyOpenFolder = document.getElementById("empty-open-folder") as HTMLButtonElement;
 
-newFileBtn.innerHTML = icons.filePlus;
-openFileBtn.innerHTML = icons.file;
-openFolderBtn.innerHTML = icons.folderOpen;
-toggleSidebarBtn.innerHTML = icons.panel;
-exportPdfBtn.innerHTML = icons.filePdf;
 emptyNewFile.innerHTML = iconLabel(icons.filePlus, "New document");
 emptyOpenFile.innerHTML = iconLabel(icons.file, "Open file");
 emptyOpenFolder.innerHTML = iconLabel(icons.folderOpen, "Open folder");
 
-// --- Editor lifecycle ------------------------------------------------------
 let editor: EditorHandle | null = null;
 let loading = false;
 let activeModified: number | null = null;
 let baseDir: string | null = null;
 let hasOpenDocument = false;
+let lastOpenFolder: string | null = null;
 
 function isReaderMode(): boolean {
   return loadPreferences().readerMode;
@@ -109,7 +99,6 @@ async function showTab(tab: Tab): Promise<void> {
   void editorHost.offsetWidth;
   editorHost.classList.add("fade-in");
 
-  sidebar.setActive(tab.path);
   baseDir = tab.path ? dirname(tab.path) : null;
   processImages();
   activeModified = tab.path ? await fetchModified(tab.path) : null;
@@ -126,7 +115,6 @@ function showEmpty(): void {
   emptyState.hidden = false;
   hasOpenDocument = false;
   refreshStatusbarVisibility();
-  sidebar.setActive(null);
 }
 
 function captureActiveWorking(): void {
@@ -145,7 +133,6 @@ async function fetchModified(path: string): Promise<number | null> {
   }
 }
 
-// --- Managers --------------------------------------------------------------
 const tabs = new TabsManager(
   tabbar,
   (tab) => {
@@ -161,9 +148,6 @@ const tabs = new TabsManager(
   }
 );
 
-const sidebar = new Sidebar(fileTree, (path) => void openFile(path));
-
-// --- File operations -------------------------------------------------------
 async function openFile(path: string): Promise<void> {
   const existing = tabs.findByPath(path);
   if (existing) {
@@ -174,9 +158,8 @@ async function openFile(path: string): Promise<void> {
   try {
     const content = await readFile(path);
     tabs.open(path, content);
-    if (loadPreferences().sidebarCollapsedOnStart) {
-      setSidebarCollapsed(true);
-    }
+    addRecentFile(path);
+    navbar.refresh();
   } catch (e) {
     console.error(e);
     alert(`Could not open file:\n${e}`);
@@ -196,12 +179,12 @@ async function pickFile(): Promise<void> {
 
 async function pickFolder(): Promise<void> {
   const dir = await openDialog({ directory: true, multiple: false });
-  if (typeof dir === "string") await sidebar.setRoot(dir);
+  if (typeof dir === "string") lastOpenFolder = dir;
 }
 
 function defaultSaveDirectory(tab: Tab): string | null {
   if (tab.path) return dirname(tab.path);
-  return sidebar.getRoot();
+  return lastOpenFolder;
 }
 
 async function renameTab(tab: Tab, rawName: string): Promise<void> {
@@ -226,12 +209,12 @@ async function renameTab(tab: Tab, rawName: string): Promise<void> {
   try {
     await renameFile(tab.path, newPath);
     tabs.updatePath(tab.id, newPath);
+    addRecentFile(newPath);
+    navbar.refresh();
     if (tabs.active?.id === tab.id) {
       baseDir = dirname(newPath);
-      sidebar.setActive(newPath);
     }
     await refreshWatched();
-    await sidebar.refresh();
   } catch (e) {
     console.error(e);
     alert(`Could not rename file:\n${e}`);
@@ -258,16 +241,21 @@ async function saveActive(): Promise<void> {
   try {
     await writeFile(path, content);
     tabs.markSaved(active.id, path, content);
+    addRecentFile(path);
+    navbar.refresh();
     activeModified = await fetchModified(path);
     updateMetrics(content, activeModified);
     baseDir = dirname(path);
-    sidebar.setActive(path);
     await refreshWatched();
-    await sidebar.refresh();
   } catch (e) {
     console.error(e);
     alert(`Failed to save:\n${e}`);
   }
+}
+
+function closeActiveTab(): void {
+  const active = tabs.active;
+  if (active) tabs.close(active.id);
 }
 
 async function refreshWatched(): Promise<void> {
@@ -278,7 +266,6 @@ async function refreshWatched(): Promise<void> {
   }
 }
 
-// --- Local image rendering -------------------------------------------------
 function resolveImageSrc(src: string): string {
   if (/^(https?:|data:|blob:|asset:)/i.test(src) || src.includes("asset.localhost")) {
     return src;
@@ -317,19 +304,6 @@ imageObserver.observe(editorHost, {
   attributeFilter: ["src"],
 });
 
-// --- Sidebar collapse ------------------------------------------------------
-const SIDEBAR_KEY = "ezdown.sidebar.collapsed";
-function setSidebarCollapsed(collapsed: boolean): void {
-  appEl.classList.toggle("sidebar-collapsed", collapsed);
-  localStorage.setItem(SIDEBAR_KEY, collapsed ? "1" : "0");
-  toggleSidebarBtn.title = collapsed
-    ? "Show sidebar (Ctrl+B)"
-    : "Collapse sidebar (Ctrl+B)";
-}
-function toggleSidebar(): void {
-  setSidebarCollapsed(!appEl.classList.contains("sidebar-collapsed"));
-}
-
 async function exportPdf(): Promise<void> {
   const active = tabs.active;
   if (!active || !editor) return;
@@ -347,26 +321,34 @@ async function exportPdf(): Promise<void> {
   });
   if (!chosen) return;
 
-  exportPdfBtn.disabled = true;
   try {
     await exportEditorToPdf(prose as HTMLElement, chosen, baseName);
   } catch (e) {
     console.error(e);
     alert(`Failed to export PDF:\n${e}`);
-  } finally {
-    exportPdfBtn.disabled = false;
   }
 }
 
-// --- Wiring ----------------------------------------------------------------
-newFileBtn.addEventListener("click", () => newFile());
-openFileBtn.addEventListener("click", () => void pickFile());
-openFolderBtn.addEventListener("click", () => void pickFolder());
+const navbar = initNavbar(
+  {
+    onNewFile: () => newFile(),
+    onOpenFile: () => void pickFile(),
+    onOpenFolder: () => void pickFolder(),
+    onSave: () => void saveActive(),
+    onExportPdf: () => void exportPdf(),
+    onCloseTab: () => closeActiveTab(),
+    onOpenRecent: (path) => void openFile(path),
+  },
+  menuFileBtn,
+  menuSettingsBtn,
+  menuHelpBtn
+);
+
+initWindowControls(windowControls);
+
 emptyNewFile.addEventListener("click", () => newFile());
 emptyOpenFile.addEventListener("click", () => void pickFile());
 emptyOpenFolder.addEventListener("click", () => void pickFolder());
-toggleSidebarBtn.addEventListener("click", () => toggleSidebar());
-exportPdfBtn.addEventListener("click", () => void exportPdf());
 
 window.addEventListener("keydown", (e) => {
   const mod = e.ctrlKey || e.metaKey;
@@ -379,9 +361,6 @@ window.addEventListener("keydown", (e) => {
   } else if (mod && e.key.toLowerCase() === "n") {
     e.preventDefault();
     newFile();
-  } else if (mod && e.key.toLowerCase() === "b") {
-    e.preventDefault();
-    toggleSidebar();
   }
 });
 
@@ -407,11 +386,9 @@ void listen<string[]>("open-files", (event) => {
   for (const path of event.payload) void openFile(path);
 });
 
-// --- Startup ---------------------------------------------------------------
 async function start(): Promise<void> {
   const prefs = loadPreferences();
   applyPreferences(prefs);
-  initSettingsPanel(settingsToggle, settingsPanel);
   initUpdateChecker();
 
   onPreferencesChange((next) => {
@@ -435,14 +412,8 @@ async function start(): Promise<void> {
       const id = tab?.dataset.tabId;
       return id ? Number(id) : null;
     },
-    getFilePath: (el) => el.closest(".tree-file")?.getAttribute("data-path") ?? null,
+    getFilePath: () => null,
   });
-
-  if (prefs.sidebarCollapsedOnStart) {
-    setSidebarCollapsed(true);
-  } else {
-    setSidebarCollapsed(localStorage.getItem(SIDEBAR_KEY) === "1");
-  }
 
   showEmpty();
 
@@ -451,7 +422,7 @@ async function start(): Promise<void> {
     const pending = await takePendingOpen();
     for (const path of pending) {
       await openFile(path);
-      if (pending.length === 1) await sidebar.setRoot(dirname(path));
+      if (pending.length === 1) lastOpenFolder = dirname(path);
     }
   } catch (e) {
     console.error(e);

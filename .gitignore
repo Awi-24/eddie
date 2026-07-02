@@ -23,6 +23,7 @@ pnpm-debug.log*
 # --- Editors / IDE ---
 .vscode/
 .idea/
+.cursor/
 *.swp
 *.swo
 

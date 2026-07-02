@@ -2,21 +2,22 @@ import { ThemeId, THEMES, applyTheme } from "./themes";
 
 export interface Preferences {
   theme: ThemeId;
-  sidebarCollapsedOnStart: boolean;
   readerMode: boolean;
   showStatusbar: boolean;
   wideColumn: boolean;
+  recentFiles: string[];
 }
 
 const PREFS_KEY = "ezdown.preferences";
 const LEGACY_THEME_KEY = "ezdown.theme";
+const MAX_RECENT_FILES = 8;
 
 const DEFAULT: Preferences = {
-  theme: "notebook",
-  sidebarCollapsedOnStart: false,
+  theme: "retro",
   readerMode: false,
   showStatusbar: true,
   wideColumn: false,
+  recentFiles: [],
 };
 
 type PrefListener = (prefs: Preferences) => void;
@@ -31,18 +32,25 @@ function migrateLegacyTheme(): ThemeId | null {
   return null;
 }
 
+function normalizeRecent(files: unknown): string[] {
+  if (!Array.isArray(files)) return [];
+  return files.filter((f): f is string => typeof f === "string").slice(0, MAX_RECENT_FILES);
+}
+
 export function loadPreferences(): Preferences {
   try {
     const raw = localStorage.getItem(PREFS_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw) as Partial<Preferences>;
+      const parsed = JSON.parse(raw) as Partial<Preferences> & {
+        sidebarCollapsedOnStart?: boolean;
+      };
+      const { sidebarCollapsedOnStart: _removed, ...rest } = parsed;
       return {
         ...DEFAULT,
-        ...parsed,
+        ...rest,
         theme:
-          parsed.theme && THEMES.includes(parsed.theme)
-            ? parsed.theme
-            : DEFAULT.theme,
+          rest.theme && THEMES.includes(rest.theme) ? rest.theme : DEFAULT.theme,
+        recentFiles: normalizeRecent(rest.recentFiles),
       };
     }
   } catch {
@@ -58,10 +66,26 @@ export function savePreferences(patch: Partial<Preferences>): Preferences {
   if (patch.theme && !THEMES.includes(patch.theme)) {
     next.theme = DEFAULT.theme;
   }
+  if (patch.recentFiles) {
+    next.recentFiles = normalizeRecent(patch.recentFiles);
+  }
   localStorage.setItem(PREFS_KEY, JSON.stringify(next));
   applyPreferences(next);
   listeners.forEach((fn) => fn(next));
   return next;
+}
+
+export function addRecentFile(path: string): void {
+  const prefs = loadPreferences();
+  const next = [path, ...prefs.recentFiles.filter((p) => p !== path)].slice(
+    0,
+    MAX_RECENT_FILES
+  );
+  savePreferences({ recentFiles: next });
+}
+
+export function clearRecentFiles(): void {
+  savePreferences({ recentFiles: [] });
 }
 
 export function onPreferencesChange(fn: PrefListener): () => void {

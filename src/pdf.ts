@@ -1,4 +1,5 @@
 import { writeBytes } from "./api";
+import { refreshDiagramsForExport } from "./diagram-renderer";
 
 /** Export rendered editor content to a PDF file on disk. */
 export async function exportEditorToPdf(
@@ -30,6 +31,8 @@ export async function exportEditorToPdf(
   heading.textContent = title;
   heading.style.cssText =
     "font-size:1.35em;margin:0 0 0.75em;font-weight:700;letter-spacing:-0.02em;";
+
+  refreshDiagramsForExport(source);
 
   const body = source.cloneNode(true) as HTMLElement;
   body.style.padding = "0";

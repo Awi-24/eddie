@@ -3,7 +3,35 @@
    skin: copy a block, give it a [data-theme="id"] selector, tweak the tokens,
    then register the id in themes/index.ts and a matching <option> in index.html. */
 
-/* ---- Notebook (default) — bright, brand cream + navy, serif reading font --- */
+/* ---- Retro EZ (default) — Mac System 7 + Digitalism + Aeonik blend -------- */
+[data-theme="retro"] {
+  --bg: #ffffff;
+  --fg: #0a0a0a;
+  --panel: #f4f4f4;
+  --surface: #ffffff;
+  --border: #000000;
+  --muted: #6e6e6e;
+  --accent: #1a1a1a;
+  --on-accent: #ffffff;
+  --hover: rgba(0, 0, 0, 0.06);
+  --selected: rgba(0, 0, 0, 0.1);
+  --code: #1a1a1a;
+  --check-border: #000000;
+  --check-fill: #000000;
+  --check-mark: #ffffff;
+  --font-body: "Segoe UI", "Geneva", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "Courier New", monospace;
+  --font-content: var(--font-body);
+  --chrome-border: 2px solid #000;
+  --shadow-hard: 3px 3px 0 #000;
+  --radius-chrome: 6px;
+  --radius-inner: 8px;
+  --win-btn-bg: #000000;
+  --win-btn-fg: #ffffff;
+  --win-btn-size: 12px;
+}
+
+/* ---- Notebook — bright, brand cream + navy, serif reading font -------------- */
 [data-theme="notebook"] {
   --bg: #faf8f1;
   --fg: #222e3a;

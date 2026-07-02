@@ -1,48 +1,88 @@
 <!doctype html>
-<html lang="en" data-theme="notebook">
+<html lang="en" data-theme="retro" data-theme-tone="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/src/assets/logo.png" />
     <title>ez.down</title>
   </head>
   <body>
     <div id="app">
-      <aside id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-          <span class="sidebar-title">ez.down</span>
-          <div class="sidebar-actions edit-only">
-            <button id="new-file" class="icon-btn" title="New document (Ctrl+N)"></button>
-            <button id="open-file" class="icon-btn" title="Open file (Ctrl+O)"></button>
-            <button id="open-folder" class="icon-btn" title="Open folder"></button>
-          </div>
+      <header id="navbar" class="navbar">
+        <div class="navbar-leading">
+          <img
+            id="navbar-logo"
+            class="navbar-logo"
+            src="/src/assets/logo.png"
+            alt="ez.down"
+            width="28"
+            height="28"
+          />
+          <nav class="navbar-menus" aria-label="Application menu">
+            <button
+              id="menu-file"
+              class="nav-menu-btn"
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded="false"
+            >
+              File
+            </button>
+            <button
+              id="menu-settings"
+              class="nav-menu-btn"
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded="false"
+            >
+              Settings
+            </button>
+            <button
+              id="menu-help"
+              class="nav-menu-btn"
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded="false"
+            >
+              Help
+            </button>
+          </nav>
         </div>
-        <div id="file-tree" class="file-tree"></div>
-        <div id="settings-panel" class="settings-panel" hidden></div>
-        <footer class="sidebar-footer">
-          <button id="settings-toggle" class="sidebar-settings-btn" type="button" aria-expanded="false"></button>
-        </footer>
-      </aside>
+        <div class="navbar-drag" data-tauri-drag-region></div>
+        <div class="window-controls" id="window-controls">
+          <button
+            type="button"
+            class="win-btn minimize"
+            title="Minimize"
+            aria-label="Minimize"
+          ></button>
+          <button
+            type="button"
+            class="win-btn maximize"
+            title="Maximize"
+            aria-label="Maximize"
+          ></button>
+          <button
+            type="button"
+            class="win-btn close"
+            title="Close"
+            aria-label="Close"
+          ></button>
+        </div>
+      </header>
 
       <main class="workspace">
-        <div class="topbar">
-          <div class="topbar-leading">
-            <div class="window-dots" aria-hidden="true">
-              <span class="window-dot close"></span>
-              <span class="window-dot minimize"></span>
-              <span class="window-dot maximize"></span>
-            </div>
-            <button id="toggle-sidebar" class="icon-btn" title="Toggle sidebar (Ctrl+B)"></button>
-          </div>
-          <div id="tabbar" class="tabbar"></div>
-          <div class="topbar-actions">
-            <button id="export-pdf" class="icon-btn" title="Export to PDF"></button>
-          </div>
-        </div>
-
         <div id="editor-host" class="editor-host"></div>
 
         <div id="empty-state" class="empty-state">
           <div class="empty-card">
+            <img
+              class="empty-logo"
+              src="/src/assets/logo.png"
+              alt=""
+              width="64"
+              height="64"
+            />
             <h1>ez.down</h1>
             <p>Edit formatted Markdown without seeing the syntax.</p>
             <div class="empty-actions">
@@ -53,15 +93,18 @@
           </div>
         </div>
 
-        <footer id="statusbar" class="statusbar" hidden>
-          <div class="status-left">
-            <span class="status-item" id="st-words"></span>
-            <span class="status-item" id="st-chars"></span>
-            <span class="status-item" id="st-lines"></span>
-          </div>
-          <div class="status-right">
-            <span class="status-item" id="st-size"></span>
-            <span class="status-item" id="st-modified"></span>
+        <footer id="bottom-bar" class="bottom-bar">
+          <div id="tabbar" class="tabbar"></div>
+          <div id="statusbar" class="statusbar" hidden>
+            <div class="status-left">
+              <span class="status-item" id="st-words"></span>
+              <span class="status-item" id="st-chars"></span>
+              <span class="status-item" id="st-lines"></span>
+            </div>
+            <div class="status-right">
+              <span class="status-item" id="st-size"></span>
+              <span class="status-item" id="st-modified"></span>
+            </div>
           </div>
         </footer>
       </main>

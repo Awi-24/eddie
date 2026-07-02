@@ -1,33 +1,41 @@
-// Minimalist flat line icons (lucide-style). Each is an inline SVG string using
-// `currentColor`, so size and color are inherited from CSS. No emojis anywhere.
+// Flat line icons — minimal, legible at 16–20px. No emojis. Uses currentColor.
 
 const svg = (paths: string) =>
-  `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+  `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">${paths}</svg>`;
 
 export const icons = {
   file: svg(
-    '<path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 21V5a2 2 0 0 1 2-2h7l5 5v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/>'
+    '<path d="M5 4h8l6 6v12H5z"/><path d="M13 4v6h6"/>'
   ),
   filePlus: svg(
-    '<path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 21V5a2 2 0 0 1 2-2h7l5 5v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><path d="M12 11v6"/><path d="M9 14h6"/>'
+    '<path d="M5 4h8l6 6v12H5z"/><path d="M13 4v6h6"/><path d="M12 13v6"/><path d="M9 16h6"/>'
   ),
-  folder: svg(
-    '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'
-  ),
+  folder: svg('<path d="M3 7h6l2 2h10v10H3z"/>'),
   folderOpen: svg(
-    '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2"/><path d="M3 7v10a2 2 0 0 0 2 2h12.5a2 2 0 0 0 1.9-1.4l1.9-6A1 1 0 0 0 20.3 10H6.2a2 2 0 0 0-1.9 1.4z"/>'
+    '<path d="M3 7h6l2 2h10"/><path d="M3 7v12h16l2-6H5"/>'
   ),
   chevron: svg('<path d="M9 6l6 6-6 6"/>'),
+  chevronDown: svg('<path d="M6 9l6 6 6-6"/>'),
+  chevronRight: svg('<path d="M9 6l6 6-6 6"/>'),
   close: svg('<path d="M6 6l12 12"/><path d="M18 6L6 18"/>'),
-  panel: svg(
-    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/>'
-  ),
   filePdf: svg(
-    '<path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 21V5a2 2 0 0 1 2-2h7l5 5v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><path d="M9 13h6"/><path d="M9 17h4"/>'
+    '<path d="M5 4h8l6 6v12H5z"/><path d="M13 4v6h6"/><path d="M8 14h8"/><path d="M8 17h5"/>'
   ),
   settings: svg(
-    '<path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'
+    '<circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>'
   ),
+  help: svg(
+    '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.2 1.8c0 2-2.7 2.2-2.7 3.7"/><path d="M12 17h.01"/>'
+  ),
+  theme: svg(
+    '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>'
+  ),
+  keyboard: svg(
+    '<rect x="2" y="6" width="20" height="12" rx="1"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/>'
+  ),
+  minimize: svg('<path d="M5 12h14"/>'),
+  maximize: svg('<rect x="5" y="5" width="14" height="14"/>'),
+  restore: svg('<path d="M8 8h10v10H8z"/><path d="M6 6h10v10"/>'),
 };
 
 /** Build a button's inner HTML: icon + optional label. */

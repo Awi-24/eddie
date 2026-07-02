@@ -1,4 +1,5 @@
 export type ThemeId =
+  | "retro"
   | "notebook"
   | "github"
   | "vscode-light"
@@ -10,9 +11,10 @@ export type ThemeId =
   | "cyberpunk"
   | "vscode-dark";
 
-const DEFAULT: ThemeId = "notebook";
+const DEFAULT: ThemeId = "retro";
 
 export const THEMES: ThemeId[] = [
+  "retro",
   "notebook",
   "github",
   "vscode-light",
@@ -26,6 +28,7 @@ export const THEMES: ThemeId[] = [
 ];
 
 export const THEME_LABELS: Record<ThemeId, string> = {
+  retro: "Retro EZ",
   notebook: "Notebook",
   github: "GitHub",
   "vscode-light": "VS Code Light",
@@ -41,7 +44,7 @@ export const THEME_LABELS: Record<ThemeId, string> = {
 export const THEME_GROUPS: { label: string; ids: ThemeId[] }[] = [
   {
     label: "Light",
-    ids: ["notebook", "github", "vscode-light", "solarized-light", "macos"],
+    ids: ["retro", "notebook", "github", "vscode-light", "solarized-light", "macos"],
   },
   {
     label: "Dark",
@@ -49,9 +52,15 @@ export const THEME_GROUPS: { label: string; ids: ThemeId[] }[] = [
   },
 ];
 
+const DARK_THEMES = new Set<ThemeId>(THEME_GROUPS[1].ids);
+
 /** Apply a skin to the document root (persistence lives in preferences.ts). */
 export function applyTheme(theme: ThemeId): void {
   document.documentElement.setAttribute("data-theme", theme);
+  document.documentElement.setAttribute(
+    "data-theme-tone",
+    DARK_THEMES.has(theme) ? "dark" : "light"
+  );
 }
 
 export function isThemeId(value: string): value is ThemeId {

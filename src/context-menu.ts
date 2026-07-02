@@ -22,11 +22,10 @@ export interface ContextMenuHandlers {
 }
 
 const SUPPRESS_SELECTOR =
-  ".context-menu, .theme-picker-menu, .milkdown-slash-menu, .milkdown-toolbar, " +
+  ".context-menu, .nav-dropdown, .nav-submenu, .milkdown-slash-menu, .milkdown-toolbar, " +
   ".milkdown-link-edit, .milkdown-link-preview, .language-picker, .list-wrapper, " +
-  ".topbar-actions, .sidebar-header, .sidebar-actions, .statusbar, .icon-btn, " +
-  ".tab-close, .theme-picker-btn, .milkdown-block-handle, .topbar > #toggle-sidebar, " +
-  ".settings-panel, .sidebar-settings-btn";
+  ".navbar, .navbar-menus, .bottom-bar, .statusbar, .icon-btn, " +
+  ".tab-close, .milkdown-block-handle, .nav-menu-btn, .window-controls, .win-btn";
 
 /** Custom right-click menus — replaces the default WebView context menu. */
 export function initContextMenu(handlers: ContextMenuHandlers): void {
@@ -81,19 +80,13 @@ export function initContextMenu(handlers: ContextMenuHandlers): void {
     }
 
     const filePath = handlers.getFilePath(target);
-    if (filePath && target.closest(".tree-file")) {
+    if (filePath) {
       return [
         {
           id: "open-file",
           label: "Open",
           action: () => handlers.onOpenFilePath(filePath),
         },
-      ];
-    }
-
-    if (target.closest("#file-tree")) {
-      return [
-        { id: "open-folder", label: "Open folder…", action: handlers.onOpenFolder },
       ];
     }
 
