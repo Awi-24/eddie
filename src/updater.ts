@@ -1,5 +1,9 @@
 import { isTauri } from "@tauri-apps/api/core";
 
+import { icons } from "./icons";
+
+declare const __APP_VERSION__: string;
+
 export type UpdateStatus =
   | { state: "idle" }
   | { state: "checking" }
@@ -30,6 +34,47 @@ export function updateAvailable(): boolean {
   return status.state === "available" || status.state === "downloading";
 }
 
+function showUpdateResult(title: string, message: string): void {
+  const existing = document.getElementById("update-result-dialog");
+  if (existing) existing.remove();
+
+  const backdrop = document.createElement("div");
+  backdrop.id = "update-result-dialog";
+  backdrop.className = "app-dialog-backdrop";
+  backdrop.innerHTML = `
+    <div class="app-dialog" role="alertdialog" aria-modal="true" aria-labelledby="update-result-title">
+      <header class="app-dialog-header">
+        <h2 id="update-result-title" class="app-dialog-title">${title}</h2>
+        <button type="button" class="app-dialog-close" aria-label="Close">${icons.close}</button>
+      </header>
+      <div class="app-dialog-body">
+        <p class="update-result-message"></p>
+      </div>
+    </div>`;
+
+  backdrop.querySelector(".update-result-message")!.textContent = message;
+
+  const close = (): void => backdrop.remove();
+
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) close();
+  });
+  backdrop.querySelector(".app-dialog-close")?.addEventListener("click", close);
+
+  const onKey = (e: KeyboardEvent): void => {
+    if (e.key === "Escape") {
+      close();
+      document.removeEventListener("keydown", onKey);
+    }
+  };
+  document.addEventListener("keydown", onKey);
+
+  document.body.appendChild(backdrop);
+  requestAnimationFrame(() => {
+    backdrop.querySelector<HTMLButtonElement>(".app-dialog-close")?.focus();
+  });
+}
+
 export async function checkForUpdates(silent = false): Promise<void> {
   if (!isTauri()) return;
 
@@ -40,6 +85,12 @@ export async function checkForUpdates(silent = false): Promise<void> {
     if (!update) {
       pending = null;
       emit(silent ? { state: "idle" } : { state: "uptodate" });
+      if (!silent) {
+        showUpdateResult(
+          "Up to date",
+          `ez.down ${__APP_VERSION__} is the latest version.`
+        );
+      }
       return;
     }
     pending = update;
@@ -52,6 +103,12 @@ export async function checkForUpdates(silent = false): Promise<void> {
     pending = null;
     const message = e instanceof Error ? e.message : String(e);
     emit(silent ? { state: "idle" } : { state: "error", message });
+    if (!silent) {
+      showUpdateResult(
+        "Update check failed",
+        `${message}\n\nIf you are running a dev build, in-app updates only work in release installers.`
+      );
+    }
   }
 }
 

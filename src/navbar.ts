@@ -177,7 +177,11 @@ export function initNavbar(
         label:
           updateStatus.state === "checking"
             ? "Checking for updates…"
-            : "Check for updates",
+            : updateStatus.state === "uptodate"
+              ? "Up to date"
+              : updateStatus.state === "error"
+                ? "Update check failed"
+                : "Check for updates",
         disabled:
           updateStatus.state === "checking" || updateStatus.state === "downloading",
         action: () => void checkForUpdates(false),

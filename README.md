@@ -47,6 +47,11 @@ Preferences are stored locally and persist across sessions.
 
 ## Changelog
 
+### 1.0.2
+
+- **In-app updates** — installers and `latest.json` use the correct version string; update check works from 1.0.0 installs.
+- **Update feedback** — Settings → Check for updates shows a dialog when up to date or on failure.
+
 ### 1.0.1
 
 - **Mermaid & HTML previews** — uses Crepe's native preview panel (fixes duplicate renders, lag, and code showing next to preview).
@@ -61,7 +66,7 @@ First public release: document-first shell, Retro EZ theme, frameless window, WY
 
 ## Release
 
-Current version: **1.0.0**. To ship **1.0.1**, bump the version, commit the changelog and code changes, tag, and push (see below).
+Current version: **1.0.2**.
 
 ## Tech stack
 
@@ -140,10 +145,10 @@ The public key is already in `src-tauri/tauri.conf.json`. **Do not commit the pr
 
 ```bash
 git add -A
-git commit -m "Release v1.0.1"
-git tag v1.0.1
+git commit -m "Release v1.0.2"
+git tag v1.0.2
 git push origin main
-git push origin v1.0.1
+git push origin v1.0.2
 ```
 
 You can also run the workflow manually from the **Actions** tab (`workflow_dispatch`).

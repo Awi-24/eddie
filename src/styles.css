@@ -1446,6 +1446,14 @@ body {
   margin-bottom: 0;
 }
 
+.update-result-message {
+  margin: 0 10px 8px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--fg);
+  white-space: pre-wrap;
+}
+
 .release-notes-footer {
   margin: 12px 10px 4px;
   padding-top: 12px;

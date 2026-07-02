@@ -8,6 +8,14 @@ interface ReleaseEntry {
 }
 
 const CHANGELOG: Record<string, ReleaseEntry> = {
+  "1.0.2": {
+    intro: "What's new in 1.0.2:",
+    notes: [
+      "Installers and latest.json now report the correct app version so in-app updates detect new releases",
+      "Check for updates shows a dialog when you are up to date or when the check fails",
+      "Settings menu reflects update status (Up to date / Update check failed)",
+    ],
+  },
   "1.0.1": {
     intro: "What's new in 1.0.1:",
     notes: [
@@ -40,7 +48,7 @@ const CHANGELOG: Record<string, ReleaseEntry> = {
   },
 };
 
-const VERSION_ORDER = ["1.0.1", "1.0.0"];
+const VERSION_ORDER = ["1.0.2", "1.0.1", "1.0.0"];
 
 let backdrop: HTMLElement | null = null;
 
