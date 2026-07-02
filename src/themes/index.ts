@@ -5,6 +5,9 @@ export type ThemeId =
   | "vscode-light"
   | "solarized-light"
   | "macos"
+  | "pink"
+  | "pixel"
+  | "nandao"
   | "dracula"
   | "nord"
   | "solarized-dark"
@@ -20,6 +23,9 @@ export const THEMES: ThemeId[] = [
   "vscode-light",
   "solarized-light",
   "macos",
+  "pink",
+  "pixel",
+  "nandao",
   "dracula",
   "nord",
   "solarized-dark",
@@ -34,6 +40,9 @@ export const THEME_LABELS: Record<ThemeId, string> = {
   "vscode-light": "VS Code Light",
   "solarized-light": "Solarized Light",
   macos: "macOS",
+  pink: "Pink",
+  pixel: "Pixel",
+  nandao: "Nandão",
   dracula: "Dracula",
   nord: "Nord",
   "solarized-dark": "Solarized Dark",
@@ -44,7 +53,7 @@ export const THEME_LABELS: Record<ThemeId, string> = {
 export const THEME_GROUPS: { label: string; ids: ThemeId[] }[] = [
   {
     label: "Light",
-    ids: ["retro", "notebook", "github", "vscode-light", "solarized-light", "macos"],
+    ids: ["retro", "notebook", "github", "vscode-light", "solarized-light", "macos", "pink", "pixel", "nandao"],
   },
   {
     label: "Dark",

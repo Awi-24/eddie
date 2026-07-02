@@ -123,6 +123,70 @@
   --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
+/* ---- Pink — soft rose reading palette ------------------------------------- */
+[data-theme="pink"] {
+  --bg: #fff5f8;
+  --fg: #4a2030;
+  --panel: #ffe8f0;
+  --surface: #fffafc;
+  --border: #f0c4d4;
+  --muted: #a86b82;
+  --accent: #e84a8a;
+  --on-accent: #ffffff;
+  --hover: #ffe0ec;
+  --selected: #ffd6e8;
+  --code: #c2185b;
+  --check-border: #e084a8;
+  --check-fill: #e84a8a;
+  --check-mark: #ffffff;
+  --font-content: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+}
+
+/* ---- Pixel — chunky 8-bit shell ----------------------------------------- */
+[data-theme="pixel"] {
+  --bg: #e8e8e8;
+  --fg: #101010;
+  --panel: #d0d0d0;
+  --surface: #f0f0f0;
+  --border: #101010;
+  --muted: #505050;
+  --accent: #0066cc;
+  --on-accent: #ffffff;
+  --hover: #c8c8c8;
+  --selected: #b0b0b0;
+  --code: #cc0000;
+  --check-border: #101010;
+  --check-fill: #0066cc;
+  --check-mark: #ffffff;
+  --font-body: "Courier New", Courier, monospace;
+  --font-content: "Courier New", Courier, monospace;
+  --font-mono: "Courier New", Courier, monospace;
+  --radius-chrome: 0;
+  --radius-inner: 0;
+  --radius: 0;
+  --radius-sm: 0;
+  --chrome-border: 2px solid #101010;
+  --shadow-hard: 4px 4px 0 #101010;
+}
+
+/* ---- Nandão — warm orange ------------------------------------------------ */
+[data-theme="nandao"] {
+  --bg: #fff8f0;
+  --fg: #3d2208;
+  --panel: #ffeed9;
+  --surface: #fffbf5;
+  --border: #e8c4a0;
+  --muted: #9a6840;
+  --accent: #f57c00;
+  --on-accent: #ffffff;
+  --hover: #ffe8cc;
+  --selected: #ffd9b3;
+  --code: #e65100;
+  --check-border: #d4956a;
+  --check-fill: #f57c00;
+  --check-mark: #ffffff;
+}
+
 /* ---- Dracula (dark) ------------------------------------------------------- */
 [data-theme="dracula"] {
   --bg: #282a36;

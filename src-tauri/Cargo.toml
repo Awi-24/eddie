@@ -1,6 +1,6 @@
 [package]
 name = "ezdown"
-version = "1.0.2"
+version = "1.0.3"
 description = "A lightweight, beautiful native WYSIWYG Markdown editor and reader."
 authors = ["Adrian Widmer"]
 license = "MIT"

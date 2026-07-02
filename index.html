@@ -76,19 +76,16 @@
 
         <div id="empty-state" class="empty-state">
           <div class="empty-card">
-            <img
-              class="empty-logo"
-              src="/src/assets/logo.png"
-              alt=""
-              width="64"
-              height="64"
-            />
             <h1>ez.down</h1>
             <p>Edit formatted Markdown without seeing the syntax.</p>
             <div class="empty-actions">
               <button id="empty-new-file" class="btn btn-primary edit-only"></button>
               <button id="empty-open-file" class="btn"></button>
               <button id="empty-open-folder" class="btn"></button>
+            </div>
+            <div id="empty-recent" class="empty-recent" hidden>
+              <p class="empty-recent-label">Recent</p>
+              <div id="empty-recent-list" class="empty-recent-list"></div>
             </div>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { showReleaseNotesDialog } from "./release-notes-dialog";
 import {
   clearRecentFiles,
   loadPreferences,
+  normalizeRecentPath,
   savePreferences,
 } from "./preferences";
 import { THEME_GROUPS, THEME_LABELS } from "./themes";
@@ -23,6 +24,7 @@ export interface NavbarHandlers {
   onNewFile: () => void;
   onOpenFile: () => void;
   onOpenFolder: () => void;
+  onToggleFolderPanel: () => void;
   onSave: () => void;
   onExportPdf: () => void;
   onCloseTab: () => void;
@@ -79,11 +81,18 @@ export function initNavbar(
 
   const buildFileItems = (): MenuItem[] => {
     const prefs = loadPreferences();
-    const recent = prefs.recentFiles.map((path) => ({
-      id: `recent-${path}`,
-      label: basename(path),
-      action: () => handlers.onOpenRecent(path),
-    }));
+    const seen = new Set<string>();
+    const recent: MenuItem[] = [];
+    for (const path of prefs.recentFiles) {
+      const key = normalizeRecentPath(path);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      recent.push({
+        id: `recent-${key}`,
+        label: basename(path),
+        action: () => handlers.onOpenRecent(path),
+      });
+    }
 
     const items: MenuItem[] = [
       { id: "new", label: "New document", shortcut: "Ctrl+N", action: handlers.onNewFile },
@@ -155,13 +164,25 @@ export function initNavbar(
         checked: prefs.readerMode,
         action: () => savePreferences({ readerMode: !prefs.readerMode }),
       },
+    ];
+
+    if (prefs.openFolder) {
+      items.push({
+        id: "folder-panel",
+        label: "Folder panel",
+        checked: prefs.folderPanelVisible,
+        action: handlers.onToggleFolderPanel,
+      });
+    }
+
+    items.push(
       { id: "sep-theme", label: "", separator: true },
       {
         id: "theme-submenu",
         label: "Theme",
         submenu: buildThemeSubmenu(),
-      },
-    ];
+      }
+    );
 
     if (isTauri()) {
       items.push({ id: "sep-updates", label: "", separator: true });

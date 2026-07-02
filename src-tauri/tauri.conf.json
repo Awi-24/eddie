@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "ez.down",
   "mainBinaryName": "ezdown",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "identifier": "dev.ezdown.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -31,12 +31,12 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "deb", "appimage"],
+    "targets": ["nsis", "deb", "appimage", "dmg"],
     "publisher": "Adrian Widmer",
     "copyright": "Copyright © 2026 Adrian Widmer",
     "category": "Productivity",
     "shortDescription": "Native WYSIWYG Markdown editor and reader.",
-    "longDescription": "ez.down is a lightweight, open-source WYSIWYG Markdown editor and reader for Windows and Linux. Edit formatted Markdown without seeing the syntax, set it as your default .md app, and switch between beautiful built-in themes.",
+    "longDescription": "ez.down is a lightweight, open-source WYSIWYG Markdown editor and reader for Windows, Linux, and macOS. Edit formatted Markdown without seeing the syntax, set it as your default .md app, and switch between beautiful built-in themes.",
     "homepage": "https://github.com/Awi-24/ez.down",
     "license": "MIT",
     "createUpdaterArtifacts": true,

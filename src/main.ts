@@ -22,10 +22,15 @@ import {
   applyPreferences,
   loadPreferences,
   onPreferencesChange,
+  removeRecentFile,
+  repairRecentFiles,
+  savePreferences,
 } from "./preferences";
 import { initNavbar } from "./navbar";
 import { initWindowControls } from "./window-controls";
 import { initUpdateChecker } from "./updater";
+import { initFolderPanel } from "./folder-panel";
+import { initEmptyRecent } from "./empty-recent";
 import {
   buildSavePath,
   ensureMdExtension,
@@ -43,6 +48,7 @@ const MD_FILTER = [
 
 const editorHost = document.getElementById("editor-host") as HTMLElement;
 const emptyState = document.getElementById("empty-state") as HTMLElement;
+const workspace = document.querySelector(".workspace") as HTMLElement;
 const tabbar = document.getElementById("tabbar") as HTMLElement;
 const menuFileBtn = document.getElementById("menu-file") as HTMLButtonElement;
 const menuSettingsBtn = document.getElementById("menu-settings") as HTMLButtonElement;
@@ -51,6 +57,8 @@ const windowControls = document.getElementById("window-controls") as HTMLElement
 const emptyNewFile = document.getElementById("empty-new-file") as HTMLButtonElement;
 const emptyOpenFile = document.getElementById("empty-open-file") as HTMLButtonElement;
 const emptyOpenFolder = document.getElementById("empty-open-folder") as HTMLButtonElement;
+const emptyRecent = document.getElementById("empty-recent") as HTMLElement;
+const emptyRecentList = document.getElementById("empty-recent-list") as HTMLElement;
 
 emptyNewFile.innerHTML = iconLabel(icons.filePlus, "New document");
 emptyOpenFile.innerHTML = iconLabel(icons.file, "Open file");
@@ -58,10 +66,18 @@ emptyOpenFolder.innerHTML = iconLabel(icons.folderOpen, "Open folder");
 
 let editor: EditorHandle | null = null;
 let loading = false;
+let showSeq = 0;
 let activeModified: number | null = null;
 let baseDir: string | null = null;
 let hasOpenDocument = false;
-let lastOpenFolder: string | null = null;
+
+const folderPanel = initFolderPanel(workspace, {
+  onOpenFile: (path) => void openFile(path),
+});
+
+const emptyRecentBar = initEmptyRecent(emptyRecent, emptyRecentList, (path) => {
+  void openFile(path);
+});
 
 function isReaderMode(): boolean {
   return loadPreferences().readerMode;
@@ -72,37 +88,59 @@ function refreshStatusbarVisibility(): void {
 }
 
 async function showTab(tab: Tab): Promise<void> {
+  const seq = ++showSeq;
   loading = true;
-  if (editor) {
-    await editor.destroy();
-    editor = null;
+  try {
+    if (editor) {
+      await editor.destroy();
+      editor = null;
+    }
+    if (seq !== showSeq) return;
+
+    editorHost.innerHTML = "";
+    emptyState.hidden = true;
+    editorHost.hidden = false;
+    hasOpenDocument = true;
+    refreshStatusbarVisibility();
+
+    const readerMode = isReaderMode();
+    editor = await mountEditor(
+      editorHost,
+      tab.workingContent,
+      (md) => {
+        if (loading) return;
+        tabs.setWorking(tab.id, md);
+        updateMetrics(md, activeModified);
+      },
+      readerMode
+    );
+    if (seq !== showSeq) {
+      await editor.destroy();
+      editor = null;
+      return;
+    }
+
+    loading = false;
+    editorHost.classList.remove("fade-in");
+    void editorHost.offsetWidth;
+    editorHost.classList.add("fade-in");
+
+    baseDir = tab.path ? dirname(tab.path) : null;
+    folderPanel.setActivePath(tab.path);
+    processImages();
+    activeModified = tab.path ? await fetchModified(tab.path) : null;
+    if (seq !== showSeq) return;
+    updateMetrics(tab.workingContent, activeModified);
+
+    requestAnimationFrame(() => {
+      if (seq !== showSeq) return;
+      editorHost.querySelector<HTMLElement>(".ProseMirror")?.focus();
+    });
+  } catch (e) {
+    console.error(e);
+  } finally {
+    if (seq === showSeq) loading = false;
   }
-  editorHost.innerHTML = "";
-  emptyState.hidden = true;
-  editorHost.hidden = false;
-  hasOpenDocument = true;
-  refreshStatusbarVisibility();
-
-  const readOnly = isReaderMode();
-  editor = await mountEditor(
-    editorHost,
-    tab.workingContent,
-    (md) => {
-      if (loading || readOnly) return;
-      tabs.setWorking(tab.id, md);
-      updateMetrics(md, activeModified);
-    },
-    readOnly
-  );
-  loading = false;
-  editorHost.classList.remove("fade-in");
-  void editorHost.offsetWidth;
-  editorHost.classList.add("fade-in");
-
-  baseDir = tab.path ? dirname(tab.path) : null;
-  processImages();
-  activeModified = tab.path ? await fetchModified(tab.path) : null;
-  updateMetrics(tab.workingContent, activeModified);
 }
 
 function showEmpty(): void {
@@ -114,6 +152,8 @@ function showEmpty(): void {
   editorHost.hidden = true;
   emptyState.hidden = false;
   hasOpenDocument = false;
+  folderPanel.setActivePath(null);
+  void emptyRecentBar.refresh();
   refreshStatusbarVisibility();
 }
 
@@ -160,15 +200,21 @@ async function openFile(path: string): Promise<void> {
     tabs.open(path, content);
     addRecentFile(path);
     navbar.refresh();
+    void emptyRecentBar.refresh();
   } catch (e) {
     console.error(e);
-    alert(`Could not open file:\n${e}`);
+    removeRecentFile(path);
+    navbar.refresh();
+    void emptyRecentBar.refresh();
+    alert(`Could not open file:\n${e}\n\nIt may have been moved or deleted.`);
   }
 }
 
 function newFile(): void {
-  if (isReaderMode()) return;
   captureActiveWorking();
+  if (isReaderMode()) {
+    savePreferences({ readerMode: false });
+  }
   tabs.open(null, "");
 }
 
@@ -179,12 +225,14 @@ async function pickFile(): Promise<void> {
 
 async function pickFolder(): Promise<void> {
   const dir = await openDialog({ directory: true, multiple: false });
-  if (typeof dir === "string") lastOpenFolder = dir;
+  if (typeof dir !== "string") return;
+  await folderPanel.openFolder(dir);
+  navbar.refresh();
 }
 
 function defaultSaveDirectory(tab: Tab): string | null {
   if (tab.path) return dirname(tab.path);
-  return lastOpenFolder;
+  return loadPreferences().openFolder;
 }
 
 async function renameTab(tab: Tab, rawName: string): Promise<void> {
@@ -215,6 +263,7 @@ async function renameTab(tab: Tab, rawName: string): Promise<void> {
       baseDir = dirname(newPath);
     }
     await refreshWatched();
+    void folderPanel.refresh();
   } catch (e) {
     console.error(e);
     alert(`Could not rename file:\n${e}`);
@@ -247,6 +296,7 @@ async function saveActive(): Promise<void> {
     updateMetrics(content, activeModified);
     baseDir = dirname(path);
     await refreshWatched();
+    void folderPanel.refresh();
   } catch (e) {
     console.error(e);
     alert(`Failed to save:\n${e}`);
@@ -334,6 +384,10 @@ const navbar = initNavbar(
     onNewFile: () => newFile(),
     onOpenFile: () => void pickFile(),
     onOpenFolder: () => void pickFolder(),
+    onToggleFolderPanel: () => {
+      folderPanel.toggle();
+      navbar.refresh();
+    },
     onSave: () => void saveActive(),
     onExportPdf: () => void exportPdf(),
     onCloseTab: () => closeActiveTab(),
@@ -350,19 +404,25 @@ emptyNewFile.addEventListener("click", () => newFile());
 emptyOpenFile.addEventListener("click", () => void pickFile());
 emptyOpenFolder.addEventListener("click", () => void pickFolder());
 
-window.addEventListener("keydown", (e) => {
-  const mod = e.ctrlKey || e.metaKey;
-  if (mod && e.key.toLowerCase() === "s") {
-    e.preventDefault();
-    void saveActive();
-  } else if (mod && e.key.toLowerCase() === "o") {
-    e.preventDefault();
-    void pickFile();
-  } else if (mod && e.key.toLowerCase() === "n") {
-    e.preventDefault();
-    newFile();
-  }
-});
+window.addEventListener(
+  "keydown",
+  (e) => {
+    const mod = e.ctrlKey || e.metaKey;
+    if (!mod) return;
+    const key = e.key.toLowerCase();
+    if (key === "s") {
+      e.preventDefault();
+      void saveActive();
+    } else if (key === "o") {
+      e.preventDefault();
+      void pickFile();
+    } else if (key === "n") {
+      e.preventDefault();
+      newFile();
+    }
+  },
+  true
+);
 
 void listen<{ path: string }>("file-changed", async (event) => {
   const tab = tabs.findByPath(event.payload.path);
@@ -416,13 +476,17 @@ async function start(): Promise<void> {
   });
 
   showEmpty();
+  repairRecentFiles();
+  void emptyRecentBar.refresh();
 
   try {
     const { takePendingOpen } = await import("./api");
     const pending = await takePendingOpen();
     for (const path of pending) {
       await openFile(path);
-      if (pending.length === 1) lastOpenFolder = dirname(path);
+      if (pending.length === 1) {
+        savePreferences({ openFolder: dirname(path) });
+      }
     }
   } catch (e) {
     console.error(e);

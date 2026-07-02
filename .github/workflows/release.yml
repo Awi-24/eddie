@@ -19,6 +19,9 @@ jobs:
             label: linux
           - platform: windows-latest
             label: windows
+          - platform: macos-latest
+            label: macos
+            args: --target universal-apple-darwin
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -39,6 +42,10 @@ jobs:
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Install macOS universal targets
+        if: matrix.label == 'macos'
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
@@ -56,6 +63,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: ez.down ${{ github.ref_name }}
+          args: ${{ matrix.args }}
           releaseBody: |
             ## Instaladores
 
@@ -63,8 +71,9 @@ jobs:
             | ---------- | ------- |
             | Windows | `*-setup.exe` (instalador NSIS) |
             | Linux | `.deb`, `.AppImage` e `latest.json` para atualização in-app |
+            | macOS | `.dmg` (Universal: Apple Silicon + Intel) |
 
-            Instalações existentes podem ser atualizadas pelo app em **Settings → Updates** ou rodando o novo instalador por cima da versão anterior.
+            Instalações existentes podem ser atualizadas pelo app em **Settings → Updates** (Windows e Linux) ou rodando o novo instalador por cima da versão anterior.
           generateReleaseNotes: true
           includeUpdaterJson: true
           updaterJsonPreferNsis: true

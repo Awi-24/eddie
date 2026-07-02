@@ -17,6 +17,7 @@ export const icons = {
   chevron: svg('<path d="M9 6l6 6-6 6"/>'),
   chevronDown: svg('<path d="M6 9l6 6 6-6"/>'),
   chevronRight: svg('<path d="M9 6l6 6-6 6"/>'),
+  chevronLeft: svg('<path d="M15 6l-6 6 6 6"/>'),
   close: svg('<path d="M6 6l12 12"/><path d="M18 6L6 18"/>'),
   filePdf: svg(
     '<path d="M5 4h8l6 6v12H5z"/><path d="M13 4v6h6"/><path d="M8 14h8"/><path d="M8 17h5"/>'
@@ -36,6 +37,9 @@ export const icons = {
   minimize: svg('<path d="M5 12h14"/>'),
   maximize: svg('<rect x="5" y="5" width="14" height="14"/>'),
   restore: svg('<path d="M8 8h10v10H8z"/><path d="M6 6h10v10"/>'),
+  refresh: svg(
+    '<path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v6h-6"/>'
+  ),
 };
 
 /** Build a button's inner HTML: icon + optional label. */

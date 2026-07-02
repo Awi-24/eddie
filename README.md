@@ -2,7 +2,7 @@
 
 # ez.down
 
-**A lightweight, beautiful, open-source WYSIWYG Markdown editor & reader for Windows and Linux.**
+**A lightweight, beautiful, open-source WYSIWYG Markdown editor & reader for Windows, Linux, and macOS.**
 
 </div>
 
@@ -17,12 +17,12 @@ and read or write with a clean, document-first interface.
   blocks — format without knowing Markdown syntax.
 - 📄 **Full GFM**: tables, syntax-highlighted code blocks, task lists, and **Mermaid** diagrams with a **Show preview / Show code** toggle in edit mode.
 - 🎨 **Themes**: Retro EZ (default), Notebook, GitHub, VS Code Light/Dark, Solarized Light/Dark,
-  Dracula, Nord, Cyberpunk, and **macOS** (traffic-light window chrome).
+  Dracula, Nord, Cyberpunk, **Pink**, **Pixel**, **Nandão**, and **macOS** (traffic-light window chrome).
 - 📐 **Document-first shell** — top navbar (File / Settings / Help), full-width editor,
   bottom bar with tabs and optional status metrics.
 - ⚙️ **Settings menu** — theme, reader mode, wide column, status bar, and in-app updates.
 - 📖 **Reader mode** — view-only; hides editing controls for distraction-free reading.
-- 📁 **Open files or folders** — recent files in the File menu; folder open for quick access.
+- 📁 **Open file or folder** — **Open file** uses the system file picker; **Open folder** opens a draggable floating browser with breadcrumb navigation, edge snap, and a minimize bubble; empty state lists your 5 most recent files.
 - 🪟 **Multiple tabs** with unsaved-change indicators and smart names from document headings.
 - 🔗 **File association** for `.md` / `.markdown` (open on double-click).
 - 📊 **Status bar** with live word, character and line counts (optional).
@@ -30,6 +30,8 @@ and read or write with a clean, document-first interface.
 - 🖱️ **Custom context menus** per area (editor, tabs, empty state).
 - 🔁 **Auto-reload** when a file changes outside the app.
 - ⬆️ **In-app updates** — check and install new versions from Settings (Windows & Linux).
+
+GitHub Releases also ship **macOS `.dmg`** installers (Universal: Apple Silicon + Intel).
 
 ## Settings
 
@@ -41,11 +43,22 @@ Open **Settings** in the top navbar:
 | **Wide reading column** | Broader text column (920px) |
 | **Show status bar** | Toggle word/line counts in the bottom bar |
 | **Reader mode** | Read-only — no editing or saving |
+| **Folder panel** | Show or hide the floating folder browser (after **Open folder**) |
 | **Updates** | Check for updates and install in place |
 
 Preferences are stored locally and persist across sessions.
 
 ## Changelog
+
+### 1.0.3
+
+- **Retro EZ** — single thick chrome line under the navbar and above the bottom bar (no duplicate shadow bands).
+- **Reader mode** — task-list checkboxes can be toggled without enabling full editing.
+- **Open file / Open folder** — separate actions: file picker for one `.md`, or a folder for the project browser.
+- **Folder panel** — floating browser with back button, breadcrumb path, drag, magnetic edge snap, and minimize to a circular bubble (click to expand); toggle in **Settings → Folder panel**.
+- **Empty state** — up to **5 recent** files, deduplicated; missing or moved paths are removed automatically.
+- **New themes** — Pink, Pixel (8-bit chrome), and Nandão (warm orange).
+- **macOS** — Universal `.dmg` in GitHub Releases (CI).
 
 ### 1.0.2
 
@@ -66,7 +79,7 @@ First public release: document-first shell, Retro EZ theme, frameless window, WY
 
 ## Release
 
-Current version: **1.0.2**.
+Current version: **1.0.3**.
 
 ## Tech stack
 
@@ -102,6 +115,8 @@ This produces, under `src-tauri/target/release/bundle/`:
 - **Linux** — `.deb` and AppImage packages. The `.deb` registers the
   `text/markdown` MIME association and sets ez.down as the default handler
   via `xdg-mime` (opt out with `EZDOWN_SKIP_DEFAULT_MIME=1` before install).
+- **macOS** — `.dmg` disk image with a Universal binary (Apple Silicon + Intel).
+  First launch may require **Right click → Open** if the app is not notarized.
 
 To verify the file association after installing on Linux:
 
@@ -118,8 +133,8 @@ python scripts/generate-installer-assets.py
 ### GitHub Release (CI)
 
 Pushes to tags matching `v*` trigger [`.github/workflows/release.yml`](.github/workflows/release.yml),
-which builds signed installers, uploads them to GitHub Releases, and publishes a `latest.json`
-manifest for in-app updates.
+which builds signed installers for **Windows**, **Linux**, and **macOS**, uploads them to GitHub Releases, and publishes a `latest.json`
+manifest for in-app updates (Windows & Linux).
 
 ### Updater signing (required for CI)
 
@@ -144,11 +159,21 @@ The public key is already in `src-tauri/tauri.conf.json`. **Do not commit the pr
 3. Commit, tag, and push:
 
 ```bash
-git add -A
-git commit -m "Release v1.0.2"
-git tag v1.0.2
+git add README.md index.html package.json package-lock.json `
+  .github/workflows/release.yml `
+  src-tauri/Cargo.toml src-tauri/Cargo.lock src-tauri/tauri.conf.json `
+  src/editor.ts src/icons.ts src/main.ts src/navbar.ts src/preferences.ts `
+  src/release-notes-dialog.ts src/styles.css src/themes/index.ts src/themes/skins.css `
+  src/empty-recent.ts src/floating-panel-chrome.ts src/floating-panel-magnet.ts src/folder-panel.ts
+
+git status
+
+git commit -m "Release v1.0.3"
+
+git tag v1.0.3
+
 git push origin main
-git push origin v1.0.2
+git push origin v1.0.3
 ```
 
 You can also run the workflow manually from the **Actions** tab (`workflow_dispatch`).

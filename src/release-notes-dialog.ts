@@ -8,6 +8,17 @@ interface ReleaseEntry {
 }
 
 const CHANGELOG: Record<string, ReleaseEntry> = {
+  "1.0.3": {
+    intro: "What's new in 1.0.3:",
+    notes: [
+      "Retro EZ — single thick chrome line under the navbar and above the bottom bar (no duplicate shadow bands)",
+      "Reader mode — task-list checkboxes can be toggled without enabling full editing",
+      "Open file and Open folder are separate: file picker for one .md, or a folder for the project browser",
+      "Folder panel — floating browser with back button, breadcrumb path, drag, magnetic edge snap, and minimize to a circular bubble; toggle in Settings → Folder panel",
+      "Empty state — up to 5 recent files, deduplicated; missing or moved paths are removed automatically",
+      "New themes: Pink, Pixel (8-bit chrome), and Nandão (warm orange)",
+    ],
+  },
   "1.0.2": {
     intro: "What's new in 1.0.2:",
     notes: [
@@ -48,7 +59,7 @@ const CHANGELOG: Record<string, ReleaseEntry> = {
   },
 };
 
-const VERSION_ORDER = ["1.0.2", "1.0.1", "1.0.0"];
+const VERSION_ORDER = ["1.0.3", "1.0.2", "1.0.1", "1.0.0"];
 
 let backdrop: HTMLElement | null = null;
 
