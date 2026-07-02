@@ -132,6 +132,13 @@ VIAddVersionKey "ProductVersion" "${VERSION}"
   !define MUI_ICON "${INSTALLERICON}"
 !endif
 
+; ez.down Modern UI theme (white / black / gray, matches Retro EZ app)
+!define MUI_BGCOLOR "FFFFFF"
+!define MUI_TEXTCOLOR "1A1A1A"
+!define MUI_WELCOMEFINISHPAGE_BITMAP_NOSTRETCH
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP_NOSTRETCH
+!define MUI_ABORTWARNING
+
 ; Installer sidebar image
 !if "${SIDEBARIMAGE}" != ""
   !define MUI_WELCOMEFINISHPAGE_BITMAP "${SIDEBARIMAGE}"

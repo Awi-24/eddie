@@ -19,7 +19,7 @@
 - Keep version in sync across `package.json`, `src-tauri/tauri.conf.json`, and `src-tauri/Cargo.toml`.
 - App preferences live in `src/preferences.ts` (localStorage); settings UI is in the navbar Settings dropdown (`src/navbar.ts`).
 - Tab naming, rename, and save-path logic live in `src/naming.ts` and `src/tabs.ts`; file rename uses the Rust `rename_file` command.
-- Current release line is `1.0.0` (first public release; prior beta builds were internal).
+- Current release line is `1.0.0`; next patch is `1.0.1` (Mermaid preview refactor + installer UI).
 - UI shell: navbar replaces sidebar; `src/sidebar.ts` removed; bottom bar holds tabbar and status metrics.
 - Default theme is `retro`; theme tokens in `src/themes/skins.css`.
 - Mermaid/HTML previews via `src/diagram-renderer.ts` with a `mermaid` dependency.

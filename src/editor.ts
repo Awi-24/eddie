@@ -1,12 +1,9 @@
-import { Crepe } from "@milkdown/crepe";
+import { Crepe, CrepeFeature } from "@milkdown/crepe";
 
 import "@milkdown/crepe/theme/common/style.css";
 import "@milkdown/crepe/theme/frame.css";
 
-import {
-  attachDiagramRenderer,
-  type DiagramRendererHandle,
-} from "./diagram-renderer";
+import { createCodeBlockRenderPreview } from "./diagram-renderer";
 
 export interface EditorHandle {
   getMarkdown: () => string;
@@ -31,6 +28,13 @@ export async function mountEditor(
           ? "Reading mode — open a document to view formatted Markdown."
           : "Write here… type / to insert blocks",
       },
+      [CrepeFeature.CodeMirror]: {
+        previewOnlyByDefault: readOnly,
+        previewLabel: "Preview",
+        renderPreview: createCodeBlockRenderPreview(),
+        previewToggleText: (previewOnly: boolean) =>
+          previewOnly ? "Show code" : "Show preview",
+      },
     },
   });
 
@@ -43,13 +47,9 @@ export async function mountEditor(
   await crepe.create();
   crepe.setReadonly(readOnly);
 
-  let diagrams: DiagramRendererHandle | null = attachDiagramRenderer(host);
-
   return {
     getMarkdown: () => crepe.getMarkdown(),
     destroy: async () => {
-      diagrams?.destroy();
-      diagrams = null;
       await crepe.destroy();
     },
   };

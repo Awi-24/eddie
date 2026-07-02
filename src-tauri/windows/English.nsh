@@ -32,5 +32,5 @@ LangString defaultMdSubtitle ${LANG_ENGLISH} "Default application"
 LangString defaultMdDescription ${LANG_ENGLISH} "ez.down can open Markdown documents with a clean WYSIWYG editor. You can change this later in Windows Settings."
 LangString defaultMdCheckbox ${LANG_ENGLISH} "Set ez.down as the default app for .md files"
 
-LangString welcomeTitle ${LANG_ENGLISH} "Welcome to the ${PRODUCTNAME} Setup"
-LangString welcomeText ${LANG_ENGLISH} "This wizard will install ${PRODUCTNAME} ${VERSION} on your computer.$\r$\n$\r$\nA native WYSIWYG Markdown editor with a retro-inspired interface."
+LangString welcomeTitle ${LANG_ENGLISH} "Install ${PRODUCTNAME}"
+LangString welcomeText ${LANG_ENGLISH} "This wizard installs ${PRODUCTNAME} ${VERSION} on your computer.$\r$\n$\r$\nA native WYSIWYG Markdown editor — write formatted text without seeing the syntax.$\r$\n$\r$\nClick Next to continue."

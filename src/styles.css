@@ -834,7 +834,80 @@ body {
   opacity: 1;
 }
 
-/* --- Diagram / HTML previews ---------------------------------------------- */
+/* --- Diagram / HTML previews (Milkdown code-block panel) ----------------- */
+/* Edit mode: code first — preview only when toggled (codemirror-host hidden). */
+:not([data-reader-mode="true"])
+  .milkdown-code-block:has(.preview-panel)
+  .preview-panel {
+  display: none;
+}
+
+:not([data-reader-mode="true"])
+  .milkdown-code-block:has(.codemirror-host.hidden)
+  .preview-panel {
+  display: block;
+}
+
+:not([data-reader-mode="true"])
+  .milkdown-code-block:has(.codemirror-host.hidden)
+  .preview-divider,
+:not([data-reader-mode="true"])
+  .milkdown-code-block:has(.codemirror-host.hidden)
+  .preview-label {
+  display: none;
+}
+
+[data-reader-mode="true"] .milkdown-code-block:has(.preview-panel) .tools,
+[data-reader-mode="true"] .milkdown-code-block:has(.preview-panel) .codemirror-host {
+  display: none !important;
+}
+
+[data-reader-mode="true"] .milkdown-code-block .preview-panel {
+  margin-top: 0;
+}
+
+[data-reader-mode="true"] .milkdown-code-block .preview-divider,
+[data-reader-mode="true"] .milkdown-code-block .preview-label {
+  display: none;
+}
+
+.milkdown-code-block .preview-panel .preview {
+  overflow: auto;
+}
+
+.milkdown-code-block .preview-panel .preview svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.milkdown-code-block .preview-toggle-button {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 550;
+}
+
+[data-theme="retro"] .milkdown-code-block .preview-panel {
+  border: 1px solid #000;
+  border-radius: var(--radius-inner, 8px);
+  overflow: hidden;
+}
+
+[data-theme="retro"] .milkdown-code-block .preview-divider {
+  background: #000;
+  height: 2px;
+}
+
+[data-theme="retro"] .milkdown-code-block .preview-toggle-button {
+  border: 1px solid #000;
+  border-radius: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+/* Legacy custom preview classes (if any remain in saved HTML) */
 .diagram-preview,
 .html-preview {
   margin-top: 8px;
@@ -1331,6 +1404,16 @@ body {
   letter-spacing: 0.03em;
   text-align: center;
   box-shadow: 0 1px 0 color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.release-notes-body .release-notes-section + .release-notes-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+}
+
+.release-notes-body .release-notes-section + .release-notes-section .release-notes-version {
+  margin-top: 0;
 }
 
 .release-notes-version {
