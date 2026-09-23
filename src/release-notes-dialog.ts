@@ -8,6 +8,18 @@ interface ReleaseEntry {
 }
 
 const CHANGELOG: Record<string, ReleaseEntry> = {
+  "1.1.0": {
+    intro: "What's new in 1.1.0:",
+    notes: [
+      "New name: Eddie (formerly ez.down) — updating removes the old install on Windows and keeps your preferences",
+      "New logo: Eddie's face, used for the app icon, installer and sidebar header; the sidebar logo follows the theme colors",
+      "Eddie the mascot, redesigned — glides between spots, hops, sparkles when you save, sleeps with floating z's; toggle in View → Mascot",
+      "Sidebar replaces the top navbar: menus open as flyouts, with Files and Outline panes",
+      "Markdown fidelity — front matter, embedded HTML, GitHub alerts, CRLF and untouched files round-trip without rewriting",
+      "Find & replace, Save as, new View menu, and shortcuts for tabs, sidebar and reader mode",
+      "Document title in the title bar; double-click or F2 to rename",
+    ],
+  },
   "1.0.3": {
     intro: "What's new in 1.0.3:",
     notes: [
@@ -101,7 +113,7 @@ function buildDialog(): HTMLElement {
   root.innerHTML = `
     <div class="app-dialog app-dialog-wide" role="dialog" aria-modal="true" aria-labelledby="release-notes-title">
       <header class="app-dialog-header">
-        <h2 id="release-notes-title" class="app-dialog-title">ez.down ${__APP_VERSION__}</h2>
+        <h2 id="release-notes-title" class="app-dialog-title">Eddie ${__APP_VERSION__}</h2>
         <button type="button" class="app-dialog-close" aria-label="Close">${icons.close}</button>
       </header>
       <div class="app-dialog-body release-notes-body">

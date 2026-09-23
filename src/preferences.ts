@@ -1,5 +1,6 @@
 import { ThemeId, THEMES, applyTheme } from "./themes";
-import type { PanelDock } from "./floating-panel-magnet";
+
+export type SidebarTab = "files" | "outline";
 
 export interface Preferences {
   theme: ThemeId;
@@ -8,10 +9,9 @@ export interface Preferences {
   wideColumn: boolean;
   recentFiles: string[];
   openFolder: string | null;
-  folderPanelVisible: boolean;
-  folderPanelMinimized: boolean;
-  folderPanelDock: PanelDock;
-  folderPanelPos: { x: number; y: number } | null;
+  sidebarCollapsed: boolean;
+  sidebarTab: SidebarTab;
+  showMascot: boolean;
 }
 
 const PREFS_KEY = "ezdown.preferences";
@@ -26,17 +26,10 @@ const DEFAULT: Preferences = {
   wideColumn: false,
   recentFiles: [],
   openFolder: null,
-  folderPanelVisible: false,
-  folderPanelMinimized: false,
-  folderPanelDock: "left",
-  folderPanelPos: null,
+  sidebarCollapsed: false,
+  sidebarTab: "outline",
+  showMascot: true,
 };
-
-function normalizePanelDock(value: unknown): PanelDock {
-  return value === "left" || value === "right" || value === "free"
-    ? value
-    : DEFAULT.folderPanelDock;
-}
 
 type PrefListener = (prefs: Preferences) => void;
 const listeners = new Set<PrefListener>();
@@ -159,21 +152,7 @@ export function loadPreferences(): Preferences {
         recentFiles,
         openFolder:
           typeof rest.openFolder === "string" ? rest.openFolder : DEFAULT.openFolder,
-        folderPanelVisible:
-          typeof rest.folderPanelVisible === "boolean"
-            ? rest.folderPanelVisible
-            : DEFAULT.folderPanelVisible,
-        folderPanelMinimized:
-          typeof rest.folderPanelMinimized === "boolean"
-            ? rest.folderPanelMinimized
-            : DEFAULT.folderPanelMinimized,
-        folderPanelDock: normalizePanelDock(rest.folderPanelDock),
-        folderPanelPos:
-          rest.folderPanelPos &&
-          typeof rest.folderPanelPos.x === "number" &&
-          typeof rest.folderPanelPos.y === "number"
-            ? rest.folderPanelPos
-            : DEFAULT.folderPanelPos,
+        sidebarTab: rest.sidebarTab === "files" ? "files" : "outline",
       };
       return prefs;
     }

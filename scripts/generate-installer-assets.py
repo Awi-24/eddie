@@ -1,4 +1,4 @@
-"""Generate NSIS installer BMP assets for ez.down (retro B/W/G palette)."""
+"""Generate NSIS installer BMP assets for Eddie (retro B/W/G palette)."""
 from __future__ import annotations
 
 import os
@@ -82,7 +82,7 @@ def draw_header() -> None:
 
     title_font = load_font(17, bold=True)
     sub_font = load_font(11)
-    draw.text((58, 13), "ez.down", fill=BLACK, font=title_font)
+    draw.text((58, 13), "Eddie", fill=BLACK, font=title_font)
     draw.text((58, 34), "Setup", fill=MUTED, font=sub_font)
 
     img.save(OUT / "header.bmp", format="BMP")
@@ -100,7 +100,7 @@ def draw_sidebar() -> None:
 
     title_font = load_font(15, bold=True)
     sub_font = load_font(11)
-    draw_centered_text(draw, 172, "ez.down", title_font, BLACK, w)
+    draw_centered_text(draw, 172, "Eddie", title_font, BLACK, w)
     draw_centered_text(draw, 194, "WYSIWYG Markdown", sub_font, MUTED, w)
     draw_centered_text(draw, 210, "editor", sub_font, MUTED, w)
 

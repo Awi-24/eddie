@@ -4,70 +4,74 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/src/assets/logo.png" />
-    <title>ez.down</title>
+    <title>Eddie</title>
   </head>
   <body>
     <div id="app">
-      <header id="navbar" class="navbar">
-        <div class="navbar-leading">
-          <img
-            id="navbar-logo"
-            class="navbar-logo"
-            src="/src/assets/logo.png"
-            alt="ez.down"
-            width="28"
-            height="28"
-          />
-          <nav class="navbar-menus" aria-label="Application menu">
-            <button
-              id="menu-file"
-              class="nav-menu-btn"
-              type="button"
-              aria-haspopup="menu"
-              aria-expanded="false"
-            >
-              File
-            </button>
-            <button
-              id="menu-settings"
-              class="nav-menu-btn"
-              type="button"
-              aria-haspopup="menu"
-              aria-expanded="false"
-            >
-              Settings
-            </button>
-            <button
-              id="menu-help"
-              class="nav-menu-btn"
-              type="button"
-              aria-haspopup="menu"
-              aria-expanded="false"
-            >
-              Help
-            </button>
-          </nav>
+      <aside id="sidebar" class="sidebar" aria-label="Sidebar">
+        <div class="sidebar-header" data-tauri-drag-region>
+          <span class="sidebar-brand" data-tauri-drag-region>
+            <!-- Eddie's head (same shape as src/assets/logo.png), colored by theme tokens -->
+            <svg class="sidebar-logo" viewBox="0 0 1024 1024" aria-label="Eddie" data-tauri-drag-region>
+              <rect class="logo-ink" x="112" y="240" width="840" height="584" rx="150" />
+              <rect class="logo-ink" x="72" y="200" width="840" height="584" rx="150" />
+              <rect class="logo-face" x="128" y="256" width="728" height="472" rx="94" />
+              <g class="logo-eyes"><g transform="translate(312 492)"><rect x="-36" y="-128" width="72" height="256" /><rect x="-36" y="-128" width="72" height="256" transform="rotate(60)" /><rect x="-36" y="-128" width="72" height="256" transform="rotate(-60)" /></g><g transform="translate(672 492)"><rect x="-36" y="-128" width="72" height="256" /><rect x="-36" y="-128" width="72" height="256" transform="rotate(60)" /><rect x="-36" y="-128" width="72" height="256" transform="rotate(-60)" /></g></g>
+            </svg>
+            <span class="sidebar-wordmark" data-tauri-drag-region>eddie</span>
+          </span>
+          <button
+            id="sidebar-toggle"
+            class="icon-btn sidebar-toggle"
+            type="button"
+            title="Collapse sidebar (Ctrl+\)"
+            aria-label="Collapse sidebar"
+            aria-expanded="true"
+          ></button>
         </div>
-        <div class="navbar-drag" data-tauri-drag-region></div>
+
+        <nav class="sidebar-menus" aria-label="Application menu">
+          <button id="menu-file" class="nav-menu-btn sidebar-item" type="button" data-icon="file" title="File" aria-haspopup="menu" aria-expanded="false">
+            <span class="sidebar-label">File</span>
+          </button>
+          <button id="menu-view" class="nav-menu-btn sidebar-item" type="button" data-icon="eye" title="View" aria-haspopup="menu" aria-expanded="false">
+            <span class="sidebar-label">View</span>
+          </button>
+          <button id="menu-settings" class="nav-menu-btn sidebar-item" type="button" data-icon="settings" title="Settings" aria-haspopup="menu" aria-expanded="false">
+            <span class="sidebar-label">Settings</span>
+          </button>
+          <button id="menu-help" class="nav-menu-btn sidebar-item" type="button" data-icon="help" title="Help" aria-haspopup="menu" aria-expanded="false">
+            <span class="sidebar-label">Help</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-tabs" role="tablist" aria-label="Sidebar panels">
+          <button class="sidebar-tab sidebar-item" type="button" role="tab" data-tab="files" data-icon="files" title="Files">
+            <span class="sidebar-label">Files</span>
+          </button>
+          <button class="sidebar-tab sidebar-item" type="button" role="tab" data-tab="outline" data-icon="headings" title="Outline (Ctrl+Shift+O)">
+            <span class="sidebar-label">Outline</span>
+          </button>
+        </div>
+
+        <div class="sidebar-body">
+          <section id="sidebar-files" class="sidebar-pane" role="tabpanel" aria-label="Files"></section>
+          <section id="sidebar-outline" class="sidebar-pane" role="tabpanel" aria-label="Outline" hidden></section>
+        </div>
+
+        <div id="sidebar-mascot" class="sidebar-mascot"></div>
+      </aside>
+
+      <div class="main-column">
+      <header id="navbar" class="navbar" data-tauri-drag-region>
+        <div></div>
+        <div class="navbar-drag" data-tauri-drag-region>
+          <span id="doc-title" class="doc-title" hidden></span>
+        </div>
         <div class="window-controls" id="window-controls">
-          <button
-            type="button"
-            class="win-btn minimize"
-            title="Minimize"
-            aria-label="Minimize"
-          ></button>
-          <button
-            type="button"
-            class="win-btn maximize"
-            title="Maximize"
-            aria-label="Maximize"
-          ></button>
-          <button
-            type="button"
-            class="win-btn close"
-            title="Close"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="win-btn minimize" title="Minimize" aria-label="Minimize"></button>
+          <button type="button" class="win-btn maximize" title="Maximize" aria-label="Maximize"></button>
+          <button type="button" class="win-btn close" title="Close" aria-label="Close"></button>
         </div>
       </header>
 
@@ -76,7 +80,6 @@
 
         <div id="empty-state" class="empty-state">
           <div class="empty-card">
-            <h1>ez.down</h1>
             <p>Edit formatted Markdown without seeing the syntax.</p>
             <div class="empty-actions">
               <button id="empty-new-file" class="btn btn-primary edit-only"></button>
@@ -105,6 +108,7 @@
           </div>
         </footer>
       </main>
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

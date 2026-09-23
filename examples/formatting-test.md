@@ -1,6 +1,11 @@
+---
+title: Markdown Formatting Test
+tags: [markdown, gfm, mermaid, html]
+---
+
 # Markdown Formatting Test
 
-Documento de teste para **ez.down** — headings, GFM, código, Mermaid e HTML.
+Documento de teste para **Eddie** — headings, GFM, código, Mermaid e HTML.
 
 ---
 
@@ -19,11 +24,11 @@ Documento de teste para **ez.down** — headings, GFM, código, Mermaid e HTML.
 
 Parágrafo normal com **negrito**, *itálico*, ***negrito + itálico***, ~~riscado~~ e `código inline`.
 
-Link: [ez.down no GitHub](https://github.com/Awi-24/ez.down)
+Link: [Eddie no GitHub](https://github.com/Awi-24/eddie)
 
 Imagem:
 
-![Placeholder 120×60](https://placehold.co/120x60/png?text=ez.down)
+![Placeholder 120×60](https://placehold.co/120x60/png?text=Eddie)
 
 ---
 
@@ -86,7 +91,7 @@ fn greet(name: &str) -> String {
 }
 
 fn main() {
-    println!("{}", greet("ez.down"));
+    println!("{}", greet("Eddie"));
 }
 ```
 
@@ -116,7 +121,7 @@ def fib(n: int) -> list[int]:
 
 ```json
 {
-  "app": "ez.down",
+  "app": "Eddie",
   "version": "1.0.0",
   "features": ["gfm", "mermaid", "html-preview"]
 }
@@ -237,7 +242,7 @@ gantt
 
 ## HTML blocks (live preview)
 
-O ez.down renderiza blocos `html` com sanitização (sem `<script>`, sem `onclick`, etc.).
+O Eddie renderiza blocos `html` com sanitização (sem `<script>`, sem `onclick`, etc.).
 
 ### Card layout
 
@@ -301,6 +306,64 @@ O ez.down renderiza blocos `html` com sanitização (sem `<script>`, sem `onclic
 
 ---
 
+## Embedded HTML (inline e bloco)
+
+Atalho <kbd>Ctrl</kbd>+<kbd>S</kbd>, fórmula H<sub>2</sub>O, x<sup>2</sup>, <mark>destaque</mark> e quebra<br>de linha.
+
+<!-- comentário: some no modo leitura -->
+
+<div align="center">
+
+**Bloco centralizado** com Markdown dentro.
+
+</div>
+
+<details>
+<summary>Clique para expandir</summary>
+
+Conteúdo escondido com *Markdown*.
+
+</details>
+
+<p style="color: #888">Parágrafo HTML com estilo inline.</p>
+
+<style>body { background: red !important; }</style>
+
+A tag `<style>` acima não deve afetar o app.
+
+---
+
+## GitHub alerts
+
+> [!NOTE]
+> Informação útil.
+
+> [!TIP]
+> Dica opcional.
+
+> [!IMPORTANT]
+> Informação essencial.
+
+> [!WARNING]
+> Atenção necessária.
+
+> [!CAUTION]
+> Consequências negativas.
+
+---
+
+## Footnotes e LaTeX
+
+Texto com nota de rodapé[^1] e fórmula inline $E = mc^2$.
+
+$$
+\int_0^1 x^2 \, dx = \frac{1}{3}
+$$
+
+[^1]: A nota de rodapé.
+
+---
+
 ## Mixed content
 
 Parágrafo final com referência a um diagrama acima, uma [tabela](#table) e blocos de código.
@@ -315,4 +378,4 @@ Parágrafo final com referência a um diagrama acima, uma [tabela](#table) e blo
 
 ---
 
-*Fim do teste — ez.down formatting suite.*
+*Fim do teste — Eddie formatting suite.*

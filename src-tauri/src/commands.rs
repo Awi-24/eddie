@@ -5,7 +5,7 @@ use std::time::UNIX_EPOCH;
 use serde::Serialize;
 use tauri::State;
 
-/// Holds the file path(s) ezdown was asked to open at launch (via CLI args /
+/// Holds the file path(s) Eddie was asked to open at launch (via CLI args /
 /// file association double-click), so the frontend can pick them up once ready.
 #[derive(Default)]
 pub struct PendingOpen(pub Mutex<Vec<String>>);
@@ -27,18 +27,6 @@ pub fn read_file(path: String) -> Result<String, String> {
 /// Write a UTF-8 text file to disk, creating parent directories if needed.
 #[tauri::command]
 pub fn write_file(path: String, content: String) -> Result<(), String> {
-    if let Some(parent) = Path::new(&path).parent() {
-        if !parent.as_os_str().is_empty() {
-            std::fs::create_dir_all(parent)
-                .map_err(|e| format!("Failed to create folder {}: {e}", parent.display()))?;
-        }
-    }
-    std::fs::write(&path, content).map_err(|e| format!("Failed to save {path}: {e}"))
-}
-
-/// Write raw bytes to disk, creating parent directories if needed.
-#[tauri::command]
-pub fn write_bytes(path: String, content: Vec<u8>) -> Result<(), String> {
     if let Some(parent) = Path::new(&path).parent() {
         if !parent.as_os_str().is_empty() {
             std::fs::create_dir_all(parent)
@@ -125,7 +113,7 @@ pub fn file_meta(path: String) -> Result<FileMeta, String> {
     })
 }
 
-/// Return (and clear) the paths ezdown was asked to open at launch.
+/// Return (and clear) the paths Eddie was asked to open at launch.
 #[tauri::command]
 pub fn take_pending_open(state: State<'_, PendingOpen>) -> Vec<String> {
     let mut guard = state.0.lock().unwrap();

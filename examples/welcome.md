@@ -1,4 +1,4 @@
-# Welcome to ez.down
+# Welcome to Eddie
 
 This is a **WYSIWYG Markdown editor**. You edit the _formatted_ text directly —
 select any text to reveal the formatting toolbar, or type `/` to insert a block.
@@ -23,8 +23,8 @@ select any text to reveal the formatting toolbar, or type `/` to insert a block.
 
 ```rust
 fn main() {
-    println!("Hello from ez.down!");
+    println!("Hello from Eddie!");
 }
 ```
 
-> Tip: switch the theme from the top-right corner.
+> Tip: switch the theme from **Settings → Theme**.

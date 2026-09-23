@@ -16,19 +16,34 @@ import {
   type UpdateStatus,
 } from "./updater";
 import { basename } from "./api";
+import type { SidebarTab } from "./preferences";
 
 const GITHUB_USER = "https://github.com/Awi-24";
-const GITHUB_REPO = "https://github.com/Awi-24/ez.down";
+const GITHUB_REPO = "https://github.com/Awi-24/eddie";
 
 export interface NavbarHandlers {
   onNewFile: () => void;
   onOpenFile: () => void;
   onOpenFolder: () => void;
-  onToggleFolderPanel: () => void;
   onSave: () => void;
+  onSaveAs: () => void;
+  onRename: () => void;
   onExportPdf: () => void;
   onCloseTab: () => void;
   onOpenRecent: (path: string) => void;
+  onFind: (withReplace: boolean) => void;
+  onToggleSidebar: () => void;
+  isSidebarCollapsed: () => boolean;
+  onShowSidebarTab: (tab: SidebarTab) => void;
+  onToggleMascot: () => void;
+  isMascotVisible: () => boolean;
+}
+
+export interface NavbarButtons {
+  file: HTMLButtonElement;
+  view: HTMLButtonElement;
+  settings: HTMLButtonElement;
+  help: HTMLButtonElement;
 }
 
 export interface NavbarHandle {
@@ -47,12 +62,10 @@ interface MenuItem {
   action?: () => void;
 }
 
-/** Top navbar with File / Settings / Help dropdown menus. */
+/** App menus (File / View / Settings / Help), opened from the sidebar as flyouts. */
 export function initNavbar(
   handlers: NavbarHandlers,
-  fileBtn: HTMLButtonElement,
-  settingsBtn: HTMLButtonElement,
-  helpBtn: HTMLButtonElement
+  { file: fileBtn, view: viewBtn, settings: settingsBtn, help: helpBtn }: NavbarButtons
 ): NavbarHandle {
   let updateStatus: UpdateStatus = { state: "idle" };
   let openTrigger: HTMLButtonElement | null = null;
@@ -113,13 +126,80 @@ export function initNavbar(
       });
     }
 
+    items.push({ id: "sep-save", label: "", separator: true });
+    if (!prefs.readerMode) {
+      items.push(
+        { id: "save", label: "Save", shortcut: "Ctrl+S", action: handlers.onSave },
+        { id: "save-as", label: "Save as…", shortcut: "Ctrl+Shift+S", action: handlers.onSaveAs },
+        { id: "rename", label: "Rename…", shortcut: "F2", action: handlers.onRename }
+      );
+    }
     items.push(
-      { id: "sep-save", label: "", separator: true },
-      { id: "save", label: "Save", shortcut: "Ctrl+S", action: handlers.onSave },
       { id: "pdf", label: "Export to PDF", action: handlers.onExportPdf },
-      { id: "close", label: "Close tab", action: handlers.onCloseTab }
+      { id: "sep-close", label: "", separator: true },
+      { id: "close", label: "Close tab", shortcut: "Ctrl+W", action: handlers.onCloseTab }
     );
 
+    return items;
+  };
+
+  const buildViewItems = (): MenuItem[] => {
+    const prefs = loadPreferences();
+    const items: MenuItem[] = [
+      {
+        id: "reader",
+        label: "Reader mode",
+        shortcut: "Ctrl+Shift+E",
+        checked: prefs.readerMode,
+        action: () => savePreferences({ readerMode: !prefs.readerMode }),
+      },
+      { id: "sep-find", label: "", separator: true },
+      { id: "find", label: "Find…", shortcut: "Ctrl+F", action: () => handlers.onFind(false) },
+    ];
+    if (!prefs.readerMode) {
+      items.push({
+        id: "replace",
+        label: "Replace…",
+        shortcut: "Ctrl+H",
+        action: () => handlers.onFind(true),
+      });
+    }
+    items.push(
+      { id: "sep-panels", label: "", separator: true },
+      {
+        id: "sidebar",
+        label: "Sidebar",
+        shortcut: "Ctrl+\\",
+        checked: !handlers.isSidebarCollapsed(),
+        action: handlers.onToggleSidebar,
+      },
+      { id: "files", label: "Files", action: () => handlers.onShowSidebarTab("files") },
+      {
+        id: "outline",
+        label: "Outline",
+        shortcut: "Ctrl+Shift+O",
+        action: () => handlers.onShowSidebarTab("outline"),
+      },
+      {
+        id: "mascot",
+        label: "Mascot",
+        checked: handlers.isMascotVisible(),
+        action: handlers.onToggleMascot,
+      },
+      { id: "sep-layout", label: "", separator: true },
+      {
+        id: "wide",
+        label: "Wide reading column",
+        checked: prefs.wideColumn,
+        action: () => savePreferences({ wideColumn: !prefs.wideColumn }),
+      },
+      {
+        id: "statusbar",
+        label: "Status bar",
+        checked: prefs.showStatusbar,
+        action: () => savePreferences({ showStatusbar: !prefs.showStatusbar }),
+      }
+    );
     return items;
   };
 
@@ -144,45 +224,9 @@ export function initNavbar(
   };
 
   const buildSettingsItems = (): MenuItem[] => {
-    const prefs = loadPreferences();
     const items: MenuItem[] = [
-      {
-        id: "wide",
-        label: "Wide reading column",
-        checked: prefs.wideColumn,
-        action: () => savePreferences({ wideColumn: !prefs.wideColumn }),
-      },
-      {
-        id: "statusbar",
-        label: "Show status bar",
-        checked: prefs.showStatusbar,
-        action: () => savePreferences({ showStatusbar: !prefs.showStatusbar }),
-      },
-      {
-        id: "reader",
-        label: "Reader mode",
-        checked: prefs.readerMode,
-        action: () => savePreferences({ readerMode: !prefs.readerMode }),
-      },
+      { id: "theme-submenu", label: "Theme", submenu: buildThemeSubmenu() },
     ];
-
-    if (prefs.openFolder) {
-      items.push({
-        id: "folder-panel",
-        label: "Folder panel",
-        checked: prefs.folderPanelVisible,
-        action: handlers.onToggleFolderPanel,
-      });
-    }
-
-    items.push(
-      { id: "sep-theme", label: "", separator: true },
-      {
-        id: "theme-submenu",
-        label: "Theme",
-        submenu: buildThemeSubmenu(),
-      }
-    );
 
     if (isTauri()) {
       items.push({ id: "sep-updates", label: "", separator: true });
@@ -209,15 +253,6 @@ export function initNavbar(
       });
     }
 
-    items.push(
-      { id: "sep-about", label: "", separator: true },
-      {
-        id: "about",
-        label: `About ez.down ${__APP_VERSION__}`,
-        action: () => void openExternal(GITHUB_REPO),
-      }
-    );
-
     return items;
   };
 
@@ -233,6 +268,11 @@ export function initNavbar(
       action: () => showReleaseNotesDialog(),
     },
     { id: "sep-gh", label: "", separator: true },
+    {
+      id: "about",
+      label: `About Eddie ${__APP_VERSION__}`,
+      action: () => void openExternal(GITHUB_REPO),
+    },
     {
       id: "repo",
       label: "GitHub repository",
@@ -334,16 +374,16 @@ export function initNavbar(
         continue;
       }
 
-      const shortcut = item.shortcut
-        ? `<span class="context-menu-shortcut">${item.shortcut}</span>`
-        : item.checked
-          ? `<span class="context-menu-shortcut">✓</span>`
-          : item.disabled && !item.action
-            ? `<span class="context-menu-shortcut"></span>`
-            : "";
+      // Toggles show their state (✓) on the right; their shortcut moves to the tooltip.
+      const isToggle = item.checked !== undefined;
+      const right = isToggle
+        ? item.checked ? "✓" : ""
+        : item.shortcut ?? (item.disabled && !item.action ? "" : null);
+      const shortcut = right === null ? "" : `<span class="context-menu-shortcut">${right}</span>`;
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "context-menu-item";
+      if (isToggle && item.shortcut) btn.title = item.shortcut;
       btn.disabled = !!item.disabled && !item.action;
       btn.innerHTML = `<span>${item.label}</span>${shortcut}`;
       btn.addEventListener("mouseenter", () => hideAllSubmenus(container));
@@ -376,44 +416,44 @@ export function initNavbar(
     menuRoot.appendChild(menu);
     menuRoot.hidden = false;
 
+    // Flyout to the right of the sidebar item, kept inside the window.
     const rect = trigger.getBoundingClientRect();
     menu.style.position = "fixed";
-    menu.style.left = `${rect.left}px`;
-    menu.style.top = `${rect.bottom + 4}px`;
-
     const menuRect = menu.getBoundingClientRect();
-    let left = rect.left;
-    let top = rect.bottom + 4;
-    if (menuRect.right > window.innerWidth - 8) {
-      left = Math.max(8, window.innerWidth - menuRect.width - 8);
-    }
-    if (menuRect.bottom > window.innerHeight - 8) {
-      top = Math.max(8, rect.top - menuRect.height - 4);
-    }
+    // Flush against the sidebar's edge, first item level with the trigger.
+    const edge = trigger.closest(".sidebar")?.getBoundingClientRect().right ?? rect.right;
+    const inset = parseFloat(getComputedStyle(menu).paddingTop) || 0;
+    const left = Math.min(edge + 4, window.innerWidth - menuRect.width - 8);
+    const top = Math.max(8, Math.min(rect.top - inset, window.innerHeight - menuRect.height - 8));
     menu.style.left = `${left}px`;
     menu.style.top = `${top}px`;
   };
 
+  const menus = new Map<HTMLButtonElement, () => MenuItem[]>([
+    [fileBtn, buildFileItems],
+    [viewBtn, buildViewItems],
+    [settingsBtn, buildSettingsItems],
+    [helpBtn, buildHelpItems],
+  ]);
+
   const refresh = (): void => {
-    if (openTrigger === fileBtn && !menuRoot.hidden) {
-      showMenu(fileBtn, buildFileItems());
-    } else if (openTrigger === settingsBtn && !menuRoot.hidden) {
-      showMenu(settingsBtn, buildSettingsItems());
-    }
+    const trigger = openTrigger;
+    const build = trigger && !menuRoot.hidden ? menus.get(trigger) : undefined;
+    if (!trigger || !build) return;
+    closeMenus(); // showMenu toggles on the same trigger; rebuild from closed.
+    showMenu(trigger, build());
   };
 
-  fileBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    showMenu(fileBtn, buildFileItems());
-  });
-  settingsBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    showMenu(settingsBtn, buildSettingsItems());
-  });
-  helpBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    showMenu(helpBtn, buildHelpItems());
-  });
+  for (const [btn, build] of menus) {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showMenu(btn, build());
+    });
+    // Menu-bar feel: with a menu open, hovering another trigger switches to it.
+    btn.addEventListener("mouseenter", () => {
+      if (openTrigger && openTrigger !== btn && !menuRoot.hidden) showMenu(btn, build());
+    });
+  }
 
   document.addEventListener("mousedown", (e) => {
     if (menuRoot.hidden) return;

@@ -1,4 +1,4 @@
-; ez.down NSIS installer hooks — default Markdown file association.
+; Eddie NSIS installer hooks — default Markdown file association.
 
 !include "LogicLib.nsh"
 
@@ -126,6 +126,26 @@ FunctionEnd
 !macroend
 
 !endif
+
+; Eddie used to ship as "ez.down" (different product name = different install
+; dir and uninstall key). Remove that copy so updating doesn't leave two apps
+; installed. Preferences survive: the app identifier is unchanged.
+; ponytail: drop this once no 1.0.x "ez.down" installs remain.
+!macro NSIS_HOOK_PREINSTALL
+  Push $R8
+  Push $R9
+  ReadRegStr $R8 SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\ez.down" "UninstallString"
+  ReadRegStr $R9 SHCTX "${MANUKEY}\ez.down" ""
+  ${If} $R8 != ""
+  ${AndIf} $R9 != ""
+    ; _?= runs the uninstaller in place so ExecWait really waits for it.
+    ExecWait '$R8 /S _?=$R9'
+    Delete "$R9\uninstall.exe"
+    RMDir "$R9"
+  ${EndIf}
+  Pop $R9
+  Pop $R8
+!macroend
 
 !macro NSIS_HOOK_POSTINSTALL
   ${If} $DefaultMdCheckboxState == ${BST_CHECKED}

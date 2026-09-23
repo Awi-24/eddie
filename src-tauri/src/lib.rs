@@ -15,7 +15,7 @@ pub fn run() {
             .plugin(tauri_plugin_updater::Builder::new().build());
     }
 
-    // Single instance: if ezdown is already running and the user opens another
+    // Single instance: if Eddie is already running and the user opens another
     // .md (double-click / "open with"), forward the path to the running window
     // instead of spawning a second process.
     #[cfg(desktop)]
@@ -49,7 +49,6 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::read_file,
             commands::write_file,
-            commands::write_bytes,
             commands::rename_file,
             commands::list_dir,
             commands::file_meta,
@@ -57,5 +56,5 @@ pub fn run() {
             fs_watch::set_watched_paths,
         ])
         .run(tauri::generate_context!())
-        .expect("error while running ezdown");
+        .expect("error while running Eddie");
 }

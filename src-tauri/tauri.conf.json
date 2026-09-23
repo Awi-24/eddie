@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "ez.down",
-  "mainBinaryName": "ezdown",
-  "version": "1.0.3",
+  "productName": "Eddie",
+  "mainBinaryName": "eddie",
+  "version": "1.1.0",
   "identifier": "dev.ezdown.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -13,7 +13,7 @@
   "app": {
     "windows": [
       {
-        "title": "ez.down",
+        "title": "Eddie",
         "width": 1100,
         "height": 760,
         "minWidth": 640,
@@ -36,8 +36,8 @@
     "copyright": "Copyright © 2026 Adrian Widmer",
     "category": "Productivity",
     "shortDescription": "Native WYSIWYG Markdown editor and reader.",
-    "longDescription": "ez.down is a lightweight, open-source WYSIWYG Markdown editor and reader for Windows, Linux, and macOS. Edit formatted Markdown without seeing the syntax, set it as your default .md app, and switch between beautiful built-in themes.",
-    "homepage": "https://github.com/Awi-24/ez.down",
+    "longDescription": "Eddie is a lightweight, open-source WYSIWYG Markdown editor and reader for Windows, Linux, and macOS. Edit formatted Markdown without seeing the syntax, set it as your default .md app, and switch between beautiful built-in themes.",
+    "homepage": "https://github.com/Awi-24/eddie",
     "license": "MIT",
     "createUpdaterArtifacts": true,
     "icon": [
@@ -81,7 +81,7 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE2Q0I5RkFCNEEwNTU2MjQKUldRa1ZnVktxNS9MRnVtWWtlMGZrVTAybkNhWkJyME81WVBHN1ZRR0lSeGowalRkcVIwK2JEREgK",
       "endpoints": [
-        "https://github.com/Awi-24/ez.down/releases/latest/download/latest.json"
+        "https://github.com/Awi-24/eddie/releases/latest/download/latest.json"
       ],
       "windows": {
         "installMode": "passive"

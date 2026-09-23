@@ -26,6 +26,8 @@ export class TabsManager {
   private tabs: Tab[] = [];
   private activeId: number | null = null;
   private editingId: number | null = null;
+  /** Called after every render (names, dirty flags or the active tab changed). */
+  onRender: () => void = () => {};
 
   constructor(
     private readonly bar: HTMLElement,
@@ -155,6 +157,20 @@ export class TabsManager {
     this.onActivate(keep);
   }
 
+  /** Show the inline rename field on a tab. */
+  startRename(id: number): void {
+    if (!this.tabs.some((t) => t.id === id)) return;
+    this.editingId = id;
+    this.render();
+  }
+
+  /** Activate the next (1) or previous (-1) tab, wrapping around. */
+  cycle(dir: 1 | -1): void {
+    const idx = this.tabs.findIndex((t) => t.id === this.activeId);
+    if (idx === -1 || this.tabs.length < 2) return;
+    this.activate(this.tabs[(idx + dir + this.tabs.length) % this.tabs.length].id);
+  }
+
   paths(): string[] {
     return this.tabs.map((t) => t.path).filter((p): p is string => !!p);
   }
@@ -163,15 +179,9 @@ export class TabsManager {
     this.bar.innerHTML = "";
     for (const tab of this.tabs) {
       const el = document.createElement("div");
-      el.className = "tab" + (tab.id === this.activeId ? " active" : "");
+      el.className = "tab" + (tab.id === this.activeId ? " active" : "") + (tab.dirty ? " dirty" : "");
       el.dataset.tabId = String(tab.id);
-      el.title = tab.path ?? `${tab.name}.md`;
-
-      if (tab.dirty) {
-        const dot = document.createElement("span");
-        dot.className = "tab-dot";
-        el.appendChild(dot);
-      }
+      el.title = (tab.path ?? `${tab.name}.md`) + (tab.dirty ? " (unsaved)" : "");
 
       if (this.editingId === tab.id) {
         const input = document.createElement("input");
@@ -212,8 +222,7 @@ export class TabsManager {
         label.addEventListener("dblclick", (e) => {
           e.stopPropagation();
           if (document.documentElement.dataset.readerMode === "true") return;
-          this.editingId = tab.id;
-          this.render();
+          this.startRename(tab.id);
         });
         el.appendChild(label);
       }
@@ -233,5 +242,6 @@ export class TabsManager {
       });
       this.bar.appendChild(el);
     }
+    this.onRender();
   }
 }

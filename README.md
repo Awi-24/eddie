@@ -1,12 +1,12 @@
 <div align="center">
 
-# ez.down
+# Eddie
 
 **A lightweight, beautiful, open-source WYSIWYG Markdown editor & reader for Windows, Linux, and macOS.**
 
 </div>
 
-ez.down opens `.md` files already formatted (Typora-style): you edit directly in
+Eddie opens `.md` files already formatted (Typora-style): you edit directly in
 the rendered text — no raw syntax. Set it as your default app for Markdown files
 and read or write with a clean, document-first interface.
 
@@ -15,14 +15,17 @@ and read or write with a clean, document-first interface.
 - ✍️ **WYSIWYG editing** (Milkdown / Crepe on ProseMirror) — no split source pane.
 - 🫧 **Selection toolbar** when you highlight text, plus a **`/` menu** to insert
   blocks — format without knowing Markdown syntax.
-- 📄 **Full GFM**: tables, syntax-highlighted code blocks, task lists, and **Mermaid** diagrams with a **Show preview / Show code** toggle in edit mode.
+- 📄 **Full GFM**: tables, syntax-highlighted code blocks, task lists, footnotes, LaTeX math, and **Mermaid** diagrams with a **Show preview / Show code** toggle in edit mode.
+- 🧩 **Embedded HTML** (`<kbd>`, `<sub>`, `<details>`, `<div align="center">`…) renders sanitized and isolated; double-click to edit the source.
+- 🗂️ **Front matter** and **GitHub alerts** (`> [!NOTE]`) are kept intact; untouched files are never rewritten on save.
+- 🔎 **Find & replace** (`Ctrl+F` / `Ctrl+H`) and an **Outline** of headings in the sidebar (`Ctrl+Shift+O`).
 - 🎨 **Themes**: Retro EZ (default), Notebook, GitHub, VS Code Light/Dark, Solarized Light/Dark,
   Dracula, Nord, Cyberpunk, **Pink**, **Pixel**, **Nandão**, and **macOS** (traffic-light window chrome).
-- 📐 **Document-first shell** — top navbar (File / Settings / Help), full-width editor,
-  bottom bar with tabs and optional status metrics.
-- ⚙️ **Settings menu** — theme, reader mode, wide column, status bar, and in-app updates.
+- 📐 **Sidebar shell** — collapsible sidebar (`Ctrl+\`) with the File / View / Settings / Help menus, Files and Outline panes,
+  and Eddie at the bottom; slim title bar with the document name, full-width editor, bottom bar with tabs and optional metrics.
+- 👁️ **View menu** — reader mode, find, sidebar, files, outline, mascot, wide column, status bar.
 - 📖 **Reader mode** — view-only; hides editing controls for distraction-free reading.
-- 📁 **Open file or folder** — **Open file** uses the system file picker; **Open folder** opens a draggable floating browser with breadcrumb navigation, edge snap, and a minimize bubble; empty state lists your 5 most recent files.
+- 📁 **Open file or folder** — **Open file** uses the system file picker; **Open folder** shows the folder in the sidebar's **Files** pane with breadcrumb navigation; the empty state lists your 5 most recent files.
 - 🪟 **Multiple tabs** with unsaved-change indicators and smart names from document headings.
 - 🔗 **File association** for `.md` / `.markdown` (open on double-click).
 - 📊 **Status bar** with live word, character and line counts (optional).
@@ -33,22 +36,36 @@ and read or write with a clean, document-first interface.
 
 GitHub Releases also ship **macOS `.dmg`** installers (Universal: Apple Silicon + Intel).
 
-## Settings
+## View & Settings
 
-Open **Settings** in the top navbar:
-
-| Preference | Description |
-| ---------- | ----------- |
-| **Theme** | Light/dark skins including Retro EZ and macOS-style chrome |
-| **Wide reading column** | Broader text column (920px) |
-| **Show status bar** | Toggle word/line counts in the bottom bar |
-| **Reader mode** | Read-only — no editing or saving |
-| **Folder panel** | Show or hide the floating folder browser (after **Open folder**) |
-| **Updates** | Check for updates and install in place |
+| Menu | Option | Description |
+| ---- | ------ | ----------- |
+| View | **Reader mode** | Read-only — no editing or saving (`Ctrl+Shift+E`) |
+| View | **Find / Replace** | Search the document (`Ctrl+F`, `Ctrl+H`) |
+| View | **Sidebar / Files / Outline** | Collapse the sidebar (`Ctrl+\`) or switch its pane |
+| View | **Mascot** | Show or hide Eddie at the bottom of the sidebar |
+| View | **Wide reading column** | Broader text column (920px) |
+| View | **Status bar** | Toggle word/line counts in the bottom bar |
+| Settings | **Theme** | Light/dark skins including Retro EZ and macOS-style chrome |
+| Settings | **Updates** | Check for updates and install in place |
 
 Preferences are stored locally and persist across sessions.
 
 ## Changelog
+
+### 1.1.0
+
+- **New name: Eddie** (formerly ez.down). Updating from ez.down removes the old install on Windows; preferences are kept.
+- **Markdown fidelity** — YAML front matter is preserved (shown as *Properties*), embedded HTML renders instead of showing raw tags, GitHub alerts are styled, inline `<br>` and image alt text survive saving, `-` bullets and `---` rules are kept, CRLF files stay CRLF, and saving a document you didn't edit writes it back byte-for-byte.
+- **Safer HTML previews** — DOMPurify sanitizing, rendered in shadow DOM so a `<style>` block can't restyle the app.
+- **Mermaid** diagrams follow the theme when switching between light and dark.
+- **Menus** — new **View** menu; **Settings** now holds theme and updates; **About** moved to **Help**. With a menu open, hovering another menu switches to it.
+- **Document title** in the title bar (italic while unsaved); double-click (or `F2`) to rename.
+- **New logo** and **Eddie**, an ASCII mascot living in a little scene at the bottom of the sidebar: he wanders, waters his plant, naps at home when you're away, follows the mouse and cheers when you save. Toggle in **View → Mascot**. Redesigned: glides between spots, hops and throws sparkles, sleeps with floating z's, and his head is a crisp CSS frame that matches the logo.
+- **Logo** — Eddie's face (two asterisk eyes in a retro box with a hard shadow) replaces the old mark in the app icons, installer art and sidebar header; the sidebar logo follows the active theme's colors.
+- **Sidebar** replaces the top navbar: menus open as flyouts, the folder browser and the outline live in sidebar panes (no more floating panels).
+- **Find & replace**, **Save as…**, and shortcuts for close tab, switch tab, sidebar and reader mode.
+- Saving no longer reloads the editor (cursor and scroll stay put).
 
 ### 1.0.3
 
@@ -79,7 +96,7 @@ First public release: document-first shell, Retro EZ theme, frameless window, WY
 
 ## Release
 
-Current version: **1.0.3**.
+Current version: **1.1.0**.
 
 ## Tech stack
 
@@ -110,11 +127,11 @@ npm run tauri build
 This produces, under `src-tauri/target/release/bundle/`:
 
 - **Windows** — an NSIS installer (`.exe`) with retro-themed UI matching the app.
-  During setup you can choose to set ez.down as the default app for `.md` files.
+  During setup you can choose to set Eddie as the default app for `.md` files.
   File associations are also registered under "Open with".
 - **Linux** — `.deb` and AppImage packages. The `.deb` registers the
-  `text/markdown` MIME association and sets ez.down as the default handler
-  via `xdg-mime` (opt out with `EZDOWN_SKIP_DEFAULT_MIME=1` before install).
+  `text/markdown` MIME association and sets Eddie as the default handler
+  via `xdg-mime` (opt out with `EDDIE_SKIP_DEFAULT_MIME=1` before install).
 - **macOS** — `.dmg` disk image with a Universal binary (Apple Silicon + Intel).
   First launch may require **Right click → Open** if the app is not notarized.
 
@@ -141,14 +158,14 @@ manifest for in-app updates (Windows & Linux).
 Generate a key pair once (keep the private key secret):
 
 ```bash
-npm run tauri -- signer generate --ci -w ~/.tauri/ezdown.key -p "" -f
+npm run tauri -- signer generate --ci -w ~/.tauri/eddie.key -p "" -f
 ```
 
 Add GitHub repository secrets:
 
 | Secret | Value |
 | ------ | ----- |
-| `TAURI_SIGNING_PRIVATE_KEY` | Full contents of `~/.tauri/ezdown.key` |
+| `TAURI_SIGNING_PRIVATE_KEY` | Full contents of `~/.tauri/eddie.key` |
 | `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | Leave empty if the key has no password |
 
 The public key is already in `src-tauri/tauri.conf.json`. **Do not commit the private key.**
@@ -164,16 +181,16 @@ git add README.md index.html package.json package-lock.json `
   src-tauri/Cargo.toml src-tauri/Cargo.lock src-tauri/tauri.conf.json `
   src/editor.ts src/icons.ts src/main.ts src/navbar.ts src/preferences.ts `
   src/release-notes-dialog.ts src/styles.css src/themes/index.ts src/themes/skins.css `
-  src/empty-recent.ts src/floating-panel-chrome.ts src/floating-panel-magnet.ts src/folder-panel.ts
+  src/empty-recent.ts src/folder-panel.ts src/sidebar.ts src/outline.ts src/find.ts src/mascot.ts src/markdown-extras.ts
 
 git status
 
-git commit -m "Release v1.0.3"
+git commit -m "Release v1.1.0"
 
-git tag v1.0.3
+git tag v1.1.0
 
 git push origin main
-git push origin v1.0.3
+git push origin v1.1.0
 ```
 
 You can also run the workflow manually from the **Actions** tab (`workflow_dispatch`).
@@ -188,6 +205,14 @@ Ensure **Settings → Actions → General → Workflow permissions** is set to
 | `Ctrl+N`   | New document    |
 | `Ctrl+O`   | Open file       |
 | `Ctrl+S`   | Save            |
+| `Ctrl+Shift+S` | Save as     |
+| `Ctrl+W`   | Close tab       |
+| `Ctrl+Tab` | Next tab        |
+| `Ctrl+F` / `Ctrl+H` | Find / replace |
+| `Ctrl+Shift+O` | Outline     |
+| `Ctrl+\`   | Toggle sidebar  |
+| `Ctrl+Shift+E` | Reader mode |
+| `F2`       | Rename document |
 
 See **Help → Keyboard shortcuts** in the app for the full list.
 

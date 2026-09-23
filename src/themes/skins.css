@@ -1,4 +1,4 @@
-/* ez.down skins. Each theme only declares shell tokens; the editor inherits
+/* Eddie skins. Each theme only declares shell tokens; the editor inherits
    them through the [data-theme] .milkdown mapping in styles.css. To add a new
    skin: copy a block, give it a [data-theme="id"] selector, tweak the tokens,
    then register the id in themes/index.ts and a matching <option> in index.html. */

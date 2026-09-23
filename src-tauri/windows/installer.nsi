@@ -132,7 +132,7 @@ VIAddVersionKey "ProductVersion" "${VERSION}"
   !define MUI_ICON "${INSTALLERICON}"
 !endif
 
-; ez.down Modern UI theme (white / black / gray, matches Retro EZ app)
+; Eddie Modern UI theme (white / black / gray, matches Retro EZ app)
 !define MUI_BGCOLOR "FFFFFF"
 !define MUI_TEXTCOLOR "1A1A1A"
 !define MUI_WELCOMEFINISHPAGE_BITMAP_NOSTRETCH
@@ -397,7 +397,7 @@ FunctionEnd
 !define MUI_PAGE_CUSTOMFUNCTION_PRE SkipIfPassive
 !insertmacro MUI_PAGE_DIRECTORY
 
-; 5b. Default Markdown handler (ez.down custom page)
+; 5b. Default Markdown handler (Eddie custom page)
 Var DefaultMdCheckbox
 Var DefaultMdCheckboxState
 

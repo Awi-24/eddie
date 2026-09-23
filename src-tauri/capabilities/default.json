@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Default capability set for ezdown",
+  "description": "Default capability set for Eddie",
   "windows": ["main"],
   "permissions": [
     "core:default",
@@ -13,6 +13,7 @@
     "core:window:allow-start-dragging",
     "core:window:allow-is-maximized",
     "core:event:default",
+    "core:webview:allow-print",
     "dialog:default",
     "dialog:allow-open",
     "dialog:allow-save",

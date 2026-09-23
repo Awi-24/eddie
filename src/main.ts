@@ -31,6 +31,11 @@ import { initWindowControls } from "./window-controls";
 import { initUpdateChecker } from "./updater";
 import { initFolderPanel } from "./folder-panel";
 import { initEmptyRecent } from "./empty-recent";
+import { setHtmlImageResolver } from "./markdown-extras";
+import { initFindBar } from "./find";
+import { initOutline } from "./outline";
+import { initMascot } from "./mascot";
+import { initSidebar } from "./sidebar";
 import {
   buildSavePath,
   ensureMdExtension,
@@ -51,6 +56,8 @@ const emptyState = document.getElementById("empty-state") as HTMLElement;
 const workspace = document.querySelector(".workspace") as HTMLElement;
 const tabbar = document.getElementById("tabbar") as HTMLElement;
 const menuFileBtn = document.getElementById("menu-file") as HTMLButtonElement;
+const menuViewBtn = document.getElementById("menu-view") as HTMLButtonElement;
+const docTitle = document.getElementById("doc-title") as HTMLElement;
 const menuSettingsBtn = document.getElementById("menu-settings") as HTMLButtonElement;
 const menuHelpBtn = document.getElementById("menu-help") as HTMLButtonElement;
 const windowControls = document.getElementById("window-controls") as HTMLElement;
@@ -71,8 +78,18 @@ let activeModified: number | null = null;
 let baseDir: string | null = null;
 let hasOpenDocument = false;
 
-const folderPanel = initFolderPanel(workspace, {
+const sidebar = initSidebar(document.getElementById("sidebar") as HTMLElement);
+const folderPanel = initFolderPanel(document.getElementById("sidebar-files") as HTMLElement, {
   onOpenFile: (path) => void openFile(path),
+  onOpenFolder: () => void pickFolder(),
+});
+
+const activeView = () => editor?.view() ?? null;
+const findBar = initFindBar(workspace, activeView, isReaderMode);
+const outline = initOutline(document.getElementById("sidebar-outline") as HTMLElement, activeView);
+const mascot = initMascot(document.getElementById("sidebar-mascot") as HTMLElement);
+sidebar.onTabChange((tab) => {
+  if (tab === "outline") outline.refresh();
 });
 
 const emptyRecentBar = initEmptyRecent(emptyRecent, emptyRecentList, (path) => {
@@ -103,6 +120,8 @@ async function showTab(tab: Tab): Promise<void> {
     hasOpenDocument = true;
     refreshStatusbarVisibility();
 
+    // Before mounting: embedded HTML resolves relative <img> paths on render.
+    baseDir = tab.path ? dirname(tab.path) : null;
     const readerMode = isReaderMode();
     editor = await mountEditor(
       editorHost,
@@ -121,11 +140,13 @@ async function showTab(tab: Tab): Promise<void> {
     }
 
     loading = false;
+    editor.onDocChange(() => outline.refresh());
+    outline.refresh();
+    findBar.refresh();
     editorHost.classList.remove("fade-in");
     void editorHost.offsetWidth;
     editorHost.classList.add("fade-in");
 
-    baseDir = tab.path ? dirname(tab.path) : null;
     folderPanel.setActivePath(tab.path);
     processImages();
     activeModified = tab.path ? await fetchModified(tab.path) : null;
@@ -152,6 +173,8 @@ function showEmpty(): void {
   editorHost.hidden = true;
   emptyState.hidden = false;
   hasOpenDocument = false;
+  findBar.close();
+  outline.refresh();
   folderPanel.setActivePath(null);
   void emptyRecentBar.refresh();
   refreshStatusbarVisibility();
@@ -227,7 +250,7 @@ async function pickFolder(): Promise<void> {
   const dir = await openDialog({ directory: true, multiple: false });
   if (typeof dir !== "string") return;
   await folderPanel.openFolder(dir);
-  navbar.refresh();
+  sidebar.showTab("files");
 }
 
 function defaultSaveDirectory(tab: Tab): string | null {
@@ -271,14 +294,14 @@ async function renameTab(tab: Tab, rawName: string): Promise<void> {
   }
 }
 
-async function saveActive(): Promise<void> {
+async function saveActive(forceDialog = false): Promise<void> {
   if (isReaderMode()) return;
   const active = tabs.active;
   if (!active || !editor) return;
   const content = editor.getMarkdown();
 
   let path = active.path;
-  if (!path) {
+  if (!path || forceDialog) {
     const chosen = await saveDialog({
       defaultPath: buildSavePath(active.name, defaultSaveDirectory(active)),
       filters: MD_FILTER,
@@ -290,6 +313,7 @@ async function saveActive(): Promise<void> {
   try {
     await writeFile(path, content);
     tabs.markSaved(active.id, path, content);
+    mascot.react("saved");
     addRecentFile(path);
     navbar.refresh();
     activeModified = await fetchModified(path);
@@ -301,6 +325,24 @@ async function saveActive(): Promise<void> {
     console.error(e);
     alert(`Failed to save:\n${e}`);
   }
+}
+
+/** Document name in the navbar + window title, with an unsaved marker. */
+function updateTitle(): void {
+  const tab = tabs.active;
+  const name = tab ? (tab.path ? basename(tab.path) : `${tab.name}.md`) : "";
+  docTitle.hidden = !tab;
+  docTitle.textContent = name;
+  docTitle.classList.toggle("dirty", !!tab?.dirty);
+  docTitle.title = tab
+    ? `${tab.path ?? "Not saved yet"}${isReaderMode() ? "" : " — double-click to rename"}`
+    : "";
+  document.title = tab ? `${name}${tab.dirty ? " (unsaved)" : ""} — Eddie` : "Eddie";
+}
+
+function renameActive(): void {
+  const active = tabs.active;
+  if (active && !isReaderMode()) tabs.startRename(active.id);
 }
 
 function closeActiveTab(): void {
@@ -346,6 +388,8 @@ function processImages(): void {
   });
 }
 
+setHtmlImageResolver(resolveImageSrc);
+
 const imageObserver = new MutationObserver(() => processImages());
 imageObserver.observe(editorHost, {
   childList: true,
@@ -357,25 +401,15 @@ imageObserver.observe(editorHost, {
 async function exportPdf(): Promise<void> {
   const active = tabs.active;
   if (!active || !editor) return;
-  captureActiveWorking();
-
-  const prose = editorHost.querySelector(".milkdown .ProseMirror");
-  if (!prose) return;
-
   const baseName = active.path
     ? stripMdExtension(basename(active.path))
     : active.name;
-  const chosen = await saveDialog({
-    defaultPath: `${baseName}.pdf`,
-    filters: [{ name: "PDF", extensions: ["pdf"] }],
-  });
-  if (!chosen) return;
-
   try {
-    await exportEditorToPdf(prose as HTMLElement, chosen, baseName);
+    await exportEditorToPdf(editorHost, baseName);
   } catch (e) {
     console.error(e);
-    alert(`Failed to export PDF:\n${e}`);
+    alert(`Failed to export PDF:
+${e}`);
   }
 }
 
@@ -384,19 +418,24 @@ const navbar = initNavbar(
     onNewFile: () => newFile(),
     onOpenFile: () => void pickFile(),
     onOpenFolder: () => void pickFolder(),
-    onToggleFolderPanel: () => {
-      folderPanel.toggle();
-      navbar.refresh();
-    },
     onSave: () => void saveActive(),
+    onSaveAs: () => void saveActive(true),
+    onRename: renameActive,
     onExportPdf: () => void exportPdf(),
     onCloseTab: () => closeActiveTab(),
     onOpenRecent: (path) => void openFile(path),
+    onFind: (withReplace) => findBar.open(withReplace),
+    onToggleSidebar: () => sidebar.toggle(),
+    isSidebarCollapsed: () => sidebar.isCollapsed(),
+    onShowSidebarTab: (tab) => sidebar.showTab(tab),
+    onToggleMascot: () => mascot.toggle(),
+    isMascotVisible: () => mascot.isVisible(),
   },
-  menuFileBtn,
-  menuSettingsBtn,
-  menuHelpBtn
+  { file: menuFileBtn, view: menuViewBtn, settings: menuSettingsBtn, help: menuHelpBtn }
 );
+
+tabs.onRender = updateTitle;
+docTitle.addEventListener("dblclick", renameActive);
 
 initWindowControls(windowControls);
 
@@ -408,17 +447,29 @@ window.addEventListener(
   "keydown",
   (e) => {
     const mod = e.ctrlKey || e.metaKey;
-    if (!mod) return;
-    const key = e.key.toLowerCase();
-    if (key === "s") {
+    if (e.key === "F2" && !mod) {
       e.preventDefault();
-      void saveActive();
-    } else if (key === "o") {
+      renameActive();
+      return;
+    }
+    if (!mod || e.altKey) return;
+    const shift = e.shiftKey;
+    // Ctrl+E, B, I, Z, Y… stay with the editor (inline code, bold, italic, history).
+    const actions: Record<string, (() => void) | undefined> = {
+      s: () => void saveActive(shift),
+      o: () => (shift ? sidebar.showTab("outline") : void pickFile()),
+      "\\": shift ? undefined : () => sidebar.toggle(),
+      n: shift ? undefined : newFile,
+      w: shift ? undefined : closeActiveTab,
+      e: shift ? () => savePreferences({ readerMode: !isReaderMode() }) : undefined,
+      f: shift ? undefined : () => findBar.open(false),
+      h: shift ? undefined : () => findBar.open(true),
+      tab: () => tabs.cycle(shift ? -1 : 1),
+    };
+    const action = actions[e.key.toLowerCase()];
+    if (action) {
       e.preventDefault();
-      void pickFile();
-    } else if (key === "n") {
-      e.preventDefault();
-      newFile();
+      action();
     }
   },
   true
@@ -451,10 +502,19 @@ async function start(): Promise<void> {
   applyPreferences(prefs);
   initUpdateChecker();
 
+  // Only theme (Mermaid colors) and reader mode need a fresh editor; other
+  // changes (recent files, panels, column width) must not reset cursor/scroll.
+  let mounted = { theme: prefs.theme, readerMode: prefs.readerMode };
   onPreferencesChange((next) => {
     applyPreferences(next);
     refreshStatusbarVisibility();
-    if (tabs.active) void showTab(tabs.active);
+    const remount = next.theme !== mounted.theme || next.readerMode !== mounted.readerMode;
+    mounted = { theme: next.theme, readerMode: next.readerMode };
+    if (remount && tabs.active) {
+      captureActiveWorking();
+      void showTab(tabs.active);
+      updateTitle();
+    }
   });
 
   initContextMenu({

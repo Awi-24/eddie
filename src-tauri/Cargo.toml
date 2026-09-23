@@ -1,6 +1,6 @@
 [package]
-name = "ezdown"
-version = "1.0.3"
+name = "eddie"
+version = "1.1.0"
 description = "A lightweight, beautiful native WYSIWYG Markdown editor and reader."
 authors = ["Adrian Widmer"]
 license = "MIT"
@@ -8,7 +8,7 @@ edition = "2021"
 rust-version = "1.77"
 
 [lib]
-name = "ezdown_lib"
+name = "eddie_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

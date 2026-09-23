@@ -26,11 +26,11 @@ LangString webview2InstallError ${LANG_ENGLISH} "Error: Installing WebView2 fail
 LangString webview2InstallSuccess ${LANG_ENGLISH} "WebView2 installed successfully"
 LangString deleteAppData ${LANG_ENGLISH} "Delete the application data"
 
-; ez.down custom installer strings
+; Eddie custom installer strings
 LangString defaultMdTitle ${LANG_ENGLISH} "Markdown files"
 LangString defaultMdSubtitle ${LANG_ENGLISH} "Default application"
-LangString defaultMdDescription ${LANG_ENGLISH} "ez.down can open Markdown documents with a clean WYSIWYG editor. You can change this later in Windows Settings."
-LangString defaultMdCheckbox ${LANG_ENGLISH} "Set ez.down as the default app for .md files"
+LangString defaultMdDescription ${LANG_ENGLISH} "Eddie can open Markdown documents with a clean WYSIWYG editor. You can change this later in Windows Settings."
+LangString defaultMdCheckbox ${LANG_ENGLISH} "Set Eddie as the default app for .md files"
 
 LangString welcomeTitle ${LANG_ENGLISH} "Install ${PRODUCTNAME}"
 LangString welcomeText ${LANG_ENGLISH} "This wizard installs ${PRODUCTNAME} ${VERSION} on your computer.$\r$\n$\r$\nA native WYSIWYG Markdown editor — write formatted text without seeing the syntax.$\r$\n$\r$\nClick Next to continue."

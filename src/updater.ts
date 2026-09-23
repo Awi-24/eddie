@@ -88,7 +88,7 @@ export async function checkForUpdates(silent = false): Promise<void> {
       if (!silent) {
         showUpdateResult(
           "Up to date",
-          `ez.down ${__APP_VERSION__} is the latest version.`
+          `Eddie ${__APP_VERSION__} is the latest version.`
         );
       }
       return;
