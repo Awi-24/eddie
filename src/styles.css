@@ -763,6 +763,7 @@ body {
   animation: none;
 }
 
+.bottom-bar .statusbar,
 .bottom-bar .status-left,
 .bottom-bar .status-right {
   gap: 12px;
@@ -1354,6 +1355,8 @@ html:not([data-reader-mode="true"])
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  /* Between the metrics group and the size / modified group, as between items. */
+  gap: 16px;
   font-size: 12px;
   color: var(--muted);
   transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease);
