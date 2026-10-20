@@ -8,6 +8,10 @@ interface ReleaseEntry {
 }
 
 const CHANGELOG: Record<string, ReleaseEntry> = {
+  "1.1.1": {
+    intro: "What's new in 1.1.1:",
+    notes: ["Status bar: the line count and the file size no longer run together"],
+  },
   "1.1.0": {
     intro: "What's new in 1.1.0:",
     notes: [

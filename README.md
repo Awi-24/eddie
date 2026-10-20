@@ -53,6 +53,10 @@ Preferences are stored locally and persist across sessions.
 
 ## Changelog
 
+### 1.1.1
+
+- **Status bar** — the line count and the file size no longer run together ("53 lines1.1 KB").
+
 ### 1.1.0
 
 - **New name: Eddie** (formerly ez.down). Updating from ez.down removes the old install on Windows; preferences are kept.
